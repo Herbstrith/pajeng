@@ -32,7 +32,8 @@ SET(LIBPAJE_HEADERS
   PajeSimulator.h
   PajeType.h
   PajeValue.h
-  PajeDefinitions.h)
+  PajeDefinitions.h
+  PajeRastroReader.h)
 SET(LIBPAJE_SOURCES
   PajeEventDefinition.cc
   PajeTraceEvent.cc
@@ -52,9 +53,12 @@ SET(LIBPAJE_SOURCES
   PajeColor.cc
   PajeException.cc
   PajeDefinitions.cc
+  PajeRastroReader.cc
 )
 
 FIND_PACKAGE(Boost REQUIRED)
+FIND_PACKAGE(librastro REQUIRED)
+
 ADD_LIBRARY(paje_library SHARED ${LIBPAJE_SOURCES})
 INCLUDE_DIRECTORIES(paje_library ${Boost_INCLUDE_DIR})
 SET_TARGET_PROPERTIES(paje_library PROPERTIES OUTPUT_NAME paje)
@@ -65,9 +69,10 @@ SET_TARGET_PROPERTIES(paje_library PROPERTIES
   SOVERSION 1)
 # bump when the API change (new functions in the header file)
 SET(LIBPAJE_APIVERSION 1)
+
 INSTALL(TARGETS paje_library DESTINATION ${LIB_INSTALL_DIR})
 INSTALL(FILES ${LIBPAJE_HEADERS} DESTINATION include)
-
+TARGET_LINK_LIBRARIES(paje_library rastro)
 #pkgconfig
 CONFIGURE_FILE (libpaje.pc.cmake libpaje.pc @ONLY)
 INSTALL (FILES ${CMAKE_CURRENT_BINARY_DIR}/libpaje.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
