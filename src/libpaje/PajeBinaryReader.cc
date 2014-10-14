@@ -79,40 +79,40 @@ PajeTraceEvent *PajeBinaryReader::scanEventLine (rst_event_t event)
   
 }
 
-//
-void PajeEventDecoder::inputEntity (PajeObject *data)
+//called by the PajeThreadReader
+void PajeBinaryReader::readNextChunk (PajeObject *data)
 {
 
   rst_event_t rst_event;
 
 
-  int i=0;
-  /* reading all the file */
-  while (rst_decode_event (&rastro, &rst_event)) 
+  
+  /* reading the file */
+  rst_decode_event(&rastro, &rst_event)); 
+  
+
+  if(rst_event->type == PajeHeaderEventId )
   {
-
-    if(rst_event->type == PajeHeaderEventId )
-    {
-       
-      PajeBinaryReader::scanDefinitionLine(rst_event->v_uint32);
      
-	    currentEvent++;
-    }
-
-    //poti event event
-    else
-    {
-      PajeTraceEvent *event = PajeBinaryReader::scanEventLine(&rst_event);
-      if (event != NULL){
-        PajeComponent::outputEntity(event);
-        delete event;
-        currentEvent++;
-      }
-
-    }
-
-    i++;
+    PajeBinaryReader::scanDefinitionLine(rst_event->v_uint32);
+   
+    currentEvent++;
   }
+
+  //poti event event
+  else
+  {
+    PajeTraceEvent *event = PajeBinaryReader::scanEventLine(&rst_event);
+    if (event != NULL){
+      PajeComponent::outputEntity(event);
+      delete event;
+      currentEvent++;
+    }
+
+  }
+
+    
+  
 
 
 

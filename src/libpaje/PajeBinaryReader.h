@@ -56,6 +56,6 @@ public:
   PajeBinaryReader (PajeDefinitions *definitions);
   ~PajeBinaryReader (void);
 
-  void inputEntity (PajeObject *data);
+  void readNextChunk ();
 };
 #endif
