@@ -22,3 +22,10 @@ french [INFRA-SONGS ANR project](http://infra-songs.gforge.inria.fr/).
 ### Detailed Installation and everything else
 
 [Check the PajeNG's wiki](https://github.com/schnorr/pajeng/wiki/).
+
+
+What i am working at:
+==================================
+Make PajeNG work with the new binary trace format, which aims to increase the performance of the tool.
+
+
