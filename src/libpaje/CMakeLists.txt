@@ -33,7 +33,7 @@ SET(LIBPAJE_HEADERS
   PajeType.h
   PajeValue.h
   PajeDefinitions.h
-  PajeRastroReader.h)
+  PajeBinaryReader.h)
 SET(LIBPAJE_SOURCES
   PajeEventDefinition.cc
   PajeTraceEvent.cc
@@ -53,7 +53,7 @@ SET(LIBPAJE_SOURCES
   PajeColor.cc
   PajeException.cc
   PajeDefinitions.cc
-  PajeRastroReader.cc
+  PajeBinaryReader.cc
 )
 
 FIND_PACKAGE(Boost REQUIRED)

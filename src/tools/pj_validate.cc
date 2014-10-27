@@ -23,6 +23,7 @@
 #include "PajeEventDecoder.h"
 #include "PajeSimulator.h"
 #include "PajeException.h"
+#include "PajeBinaryReader.h"
 #include <argp.h>
 
 #define VALIDATE_INPUT_SIZE 2
@@ -34,6 +35,7 @@ static struct argp_option options[] = {
   {"quiet", 'q', 0, OPTION_ARG_OPTIONAL, "Be quiet"},
   {"time", 't', 0, OPTION_ARG_OPTIONAL, "Print number of seconds to simulate input"},
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
+  {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
   { 0 }
 };
 
@@ -44,6 +46,7 @@ struct arguments {
   int quiet;
   int time;
   int flex;
+  int rastro;
 };
 
 static error_t parse_options (int key, char *arg, struct argp_state *state)
@@ -54,6 +57,7 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 't': arguments->time = 1; break;
   case 'q': arguments->quiet = 1; break;
   case 'f': arguments->flex = 1; break;
+  case 'r': arguments->rastro = 1;break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {
       /* Too many arguments. */
@@ -107,29 +111,44 @@ int main (int argc, char **argv)
 	reader = new PajeFlexReader(std::string(arguments.input[0]), definitions);
       }
     }else{
-      if (arguments.input_size == 0){
-	reader = new PajeFileReader();
-      }else{
-	reader = new PajeFileReader (std::string(arguments.input[0]));
-      }
+		if(arguments.rastro)
+		{
+			reader = new PajeBinaryReader(definitions);
+		}
+		else
+		{
+		  if (arguments.input_size == 0){
+			reader = new PajeFileReader();
+		  }else{
+			reader = new PajeFileReader (std::string(arguments.input[0]));
+		  }
+	}
     }
+    
 
     //alloc decoder and simulator
     if (!arguments.flex){
       decoder = new PajeEventDecoder(definitions);
     }
     simulator = new PajeSimulator ();
-
+	
+	if(arguments.rastro)
+    {
+       reader->setOutputComponent (simulator);
+	simulator->setInputComponent (reader);
+	}
+	else{
     //connect components
-    if (arguments.flex){
-      reader->setOutputComponent (simulator);
-      simulator->setInputComponent (reader);
-    }else{
-      reader->setOutputComponent (decoder);
-      decoder->setInputComponent (reader);
-      decoder->setOutputComponent (simulator);
-      simulator->setInputComponent (decoder);
-    }
+		if (arguments.flex){
+		  reader->setOutputComponent (simulator);
+		  simulator->setInputComponent (reader);
+		}else{
+		  reader->setOutputComponent (decoder);
+		  decoder->setInputComponent (reader);
+		  decoder->setOutputComponent (simulator);
+		  simulator->setInputComponent (decoder);
+		}
+	}
   }catch (PajeException& e){
     e.reportAndExit ();
   }
