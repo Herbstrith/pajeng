@@ -19,7 +19,7 @@
 #include <PajeDefinitions.h>
 #include <stdlib.h>
 
-PajeBinaryReader::PajeBinaryReader (PajeDefinitions *definitions)
+PajeBinaryReader::PajeBinaryReader (PajeDefinitions *definitions, char *file_rst)
 {
    // printf("start create binary reader\n");
   defStatus = OUT_DEF;
@@ -32,7 +32,7 @@ PajeBinaryReader::PajeBinaryReader (PajeDefinitions *definitions)
   bzero(&rastro, sizeof(rst_rastro_t));
   //open rst_file
    int status = rst_open_file (&rastro, 100000,
-                                "rastro-5-5-ms.rst",
+                                file_rst,
                                 (char*)"out.txt");
     if (status == RST_NOK){
       //TODO: throw Exception
@@ -238,7 +238,7 @@ void PajeBinaryReader::readNextChunk ()
            //  printf("its a header \n");
       PajeBinaryReader::scanDefinitionLine(rst_event.v_uint32,rst_event.ct.n_uint32);
      
-      currentEvent++;
+     // currentEvent++;
              //      printf("finished header \n");
     }
 
@@ -265,6 +265,7 @@ void PajeBinaryReader::readNextChunk ()
   }
   else
   {
+	  printf("\n %d \n",currentEvent);
         //  printf("no more data \n");
     moreData = false;
   }

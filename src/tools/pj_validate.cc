@@ -113,7 +113,7 @@ int main (int argc, char **argv)
     }else{
 		if(arguments.rastro)
 		{
-			reader = new PajeBinaryReader(definitions);
+			reader = new PajeBinaryReader(definitions,arguments.input[0]);
 		}
 		else
 		{
@@ -135,7 +135,7 @@ int main (int argc, char **argv)
 	if(arguments.rastro)
     {
        reader->setOutputComponent (simulator);
-	simulator->setInputComponent (reader);
+		simulator->setInputComponent (reader);
 	}
 	else{
     //connect components

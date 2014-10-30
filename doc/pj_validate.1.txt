@@ -46,6 +46,8 @@ OPTIONS
 
 *-f, --flex*::
     Use alternative file reader based on flex/bison (experimental).
+*-r, --rastro*::
+    Use the rastro_reader if using a .rst file
 
 *-q, --quiet*::
     Be quiet (no output on stdout).

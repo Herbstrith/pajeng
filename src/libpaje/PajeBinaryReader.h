@@ -59,7 +59,7 @@ private:
   PajeDefinitions *defs;
 
 public:
-  PajeBinaryReader (PajeDefinitions *definitions);
+  PajeBinaryReader (PajeDefinitions *definitions, char *file_rst);
   ~PajeBinaryReader (void);
   
   bool hasMoreData (void);
