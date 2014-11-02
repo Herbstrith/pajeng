@@ -31,9 +31,11 @@ PajeBinaryReader::PajeBinaryReader (PajeDefinitions *definitions, char *file_rst
 	
   bzero(&rastro, sizeof(rst_rastro_t));
   //open rst_file
-   int status = rst_open_file (&rastro, 100000,
+   int status = rst_open_file (&rastro, 10000000,
                                 file_rst,
                                 (char*)"out.txt");
+                               
+                                
     if (status == RST_NOK){
       //TODO: throw Exception
     //  printf("error at openning of the rst_file\n");
@@ -61,7 +63,7 @@ paje_line *poti_print_event (rst_event_t *event,PajeEventDefinition *eventDefini
 
 
         paje_line *paje_line_string = new paje_line;
-
+		paje_line_string->word_count = 0;		
       char temp[3];
       //sprintf(temp,"%d",event_id);
 
@@ -149,7 +151,7 @@ paje_line *poti_print_event (rst_event_t *event,PajeEventDefinition *eventDefini
    // printf("\n %s",paje_line_string->word[zz]);
   }    
    // printf("end loop \n");
-paje_line_string->word_count++;
+	paje_line_string->word_count++;
     paje_line_string->lineNumber=0;  
     return paje_line_string;
 	
@@ -193,19 +195,27 @@ PajeTraceEvent *PajeBinaryReader::scanEventLine (rst_event_t *event)
   
 
 
-  //printf("poti_print call event id %d \n",eventId);
+ // printf("poti_print call event id %d \n",eventId);
   paje_line *pajeLine = poti_print_event(event, it->second);  
   int i = 0;
   //printf(" fim do print_event");
 
-  /*for(i = 0; i < 3; i++)
+/*                     printf("on reader \n");
+
+  for(i = 0; i < 5; i++)
   {
-    printf("\n %s",pajeLine->word[i]);
-  } */               
+    printf("\n one  %s",pajeLine->word[i]);
+  } 
+                       printf("as  number  \n");
+
+   for(i = 0; i < 5; i++)
+  {
+    printf("\n %lf",pajeLine->word[i]);
+  }*/                    
   if (eventDefinition == NULL) { // printf("event DEFINITION NULL");
     throw PajeDecodeException ("Event with id '"+std::string("%d",eventId)+"' has not been defined");
   }
-                   //  printf("return  eventdefine  \n");
+                  //   printf("return  eventdefine  \n");
   return new PajeTraceEvent (eventDefinition,pajeLine);
 
   
@@ -252,9 +262,9 @@ void PajeBinaryReader::readNextChunk ()
   }*/
                //  printf("its a event \n");
       PajeTraceEvent *event = PajeBinaryReader::scanEventLine(&rst_event);
-                  //     printf("created the event \n");
+                     //  printf("created the event \n");
       if (event != NULL){
-        //printf("event id %d",event->pajeEventDefinition);
+       // printf("event id %d",event->pajeEventDefinition);
         PajeComponent::outputEntity(event);
         delete event;
         currentEvent++;
@@ -265,13 +275,13 @@ void PajeBinaryReader::readNextChunk ()
   }
   else
   {
-	  printf("\n %d \n",currentEvent);
+	 // printf("\n %d \n",currentEvent);
         //  printf("no more data \n");
     moreData = false;
   }
 
       
-     // printf("finished Read chunk \n");
+      //printf("finished Read chunk \n");
 
 
 
