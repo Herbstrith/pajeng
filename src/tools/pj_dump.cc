@@ -23,6 +23,7 @@
 #include "PajeException.h"
 #include "PajeEventDecoder.h"
 #include "PajeSimulator.h"
+#include "PajeBinaryReader.h"
 #include <argp.h>
 
 #define VALIDATE_INPUT_SIZE 2
@@ -37,6 +38,7 @@ static struct argp_option options[] = {
   {"ignore-incomplete-links", 'z', 0, OPTION_ARG_OPTIONAL, "Ignore incomplete links (not recommended)"},
   {"quiet", 'q', 0, OPTION_ARG_OPTIONAL, "Do not dump, only simulate"},
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
+  {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use rastro reader"},
   {"user-defined", 'u', 0, OPTION_ARG_OPTIONAL, "Dump user-defined fields"},
   { 0 }
 };
@@ -50,6 +52,7 @@ struct arguments {
   int quiet;
   int flex;
   int userDefined;
+  int rastro;
 };
 
 static error_t parse_options (int key, char *arg, struct argp_state *state)
@@ -63,6 +66,7 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 'z': arguments->ignoreIncompleteLinks = 1; break;
   case 'q': arguments->quiet = 1; break;
   case 'f': arguments->flex = 1; break;
+  case 'r': arguments->rastro = 1; break;
   case 'u': arguments->userDefined = 1; break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {
@@ -166,21 +170,27 @@ int main (int argc, char **argv)
 	reader = new PajeFlexReader(std::string(arguments.input[0]), definitions);
       }
     }else{
-      if (arguments.input_size == 0){
-	reader = new PajeFileReader();
-      }else{
-	reader = new PajeFileReader (std::string(arguments.input[0]));
-      }
+      if (arguments.rastro){
+		  reader = new PajeBinaryReader(definitions,arguments.input[0]);
+	  }
+	  else
+	  {
+		  if (arguments.input_size == 0){
+		reader = new PajeFileReader();
+		  }else{
+		reader = new PajeFileReader (std::string(arguments.input[0]));
+		  }
+		}
     }
 
     //alloc decoder and simulator
-    if (!arguments.flex){
+    if (!arguments.flex || !arguments.rastro){
       decoder = new PajeEventDecoder(definitions);
     }
     simulator = new PajeSimulator (arguments.stopat, arguments.ignoreIncompleteLinks);
 
     //connect components
-    if (arguments.flex){
+    if (arguments.flex || arguments.rastro){
       reader->setOutputComponent (simulator);
       simulator->setInputComponent (reader);
     }else{
