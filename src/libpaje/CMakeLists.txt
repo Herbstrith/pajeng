@@ -54,12 +54,13 @@ SET(LIBPAJE_SOURCES
   PajeException.cc
   PajeDefinitions.cc
   PajeBinaryReader.cc
+  PajeRastroTraceEvent.cc
 )
 
 FIND_PACKAGE(Boost REQUIRED)
 FIND_PACKAGE(librastro REQUIRED)
-
 ADD_LIBRARY(paje_library SHARED ${LIBPAJE_SOURCES})
+INCLUDE_DIRECTORIES(paje_library ${LIBRASTRO_INCLUDE_PATH})
 INCLUDE_DIRECTORIES(paje_library ${Boost_INCLUDE_DIR})
 SET_TARGET_PROPERTIES(paje_library PROPERTIES OUTPUT_NAME paje)
 SET_TARGET_PROPERTIES(paje_library PROPERTIES
