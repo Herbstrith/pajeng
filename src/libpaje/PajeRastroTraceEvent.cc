@@ -31,9 +31,24 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def)
   //first field is the event type
   itf++;
   itt++;
-
-  while (itf != def->fields.end()){   
-    definitionOrder[i]= def->types(i);
+  int int_mark =0,double_mark =0,string_mark =0;
+  while (itf != def->fields.end()){ 
+	if(*itt == PAJE_string || *itt == PAJE_color){
+		definitionOrder[i]= string_mark;
+		string_mark++;
+	}
+	
+	if(*itt == PAJE_double || *itt == PAJE_date){
+		definitionOrder[i]= double_mark;
+		double_mark++;
+	}
+	
+	if(*itt == PAJE_int){
+		definitionOrder[i]= int_mark;
+		int_mark++;
+	}
+	  
+    fieldOrder[i] = *itf;
     itf++;
     itt++;
     i++;
@@ -55,7 +70,7 @@ PajeEventId PajeRastroTraceEvent::pajeEventId (void)
 
 void PajeRastroTraceEvent::addField (char *field)
 {
-  str_fields.push_back (std::string(field));
+  str_fields.push_back (field);
 }
 void PajeRastroTraceEvent::addField (double field)
 {
@@ -99,11 +114,20 @@ bool PajeRastroTraceEvent::check (paje_line *line)
 
 T PajeRastroTraceEvent::valueForField (PajeField field)
 {
+  T return_value;
+  return_value.i = -1;
+  return_value.d = -1;
+  return_value.s = "-1";
   int index = pajeEventDefinition->indexForField (field);
   if (index == -1){
-    return 0;
+    return return_value;
   }else{
-    return double_fields.at(index);
+	int type = definitionOrder[index];
+	  
+	return_value.d = double_fields.at(index);
+	return_value.i = int_fields.at(index);
+	return_value.s = str_fields.at(index);
+    return return_value;
   }
 }
 
@@ -118,8 +142,14 @@ std::string PajeRastroTraceEvent::description (void) const
   unsigned int i;
   output << ", Fields: '" << str_fields.size() + double_fields.size() + int_fields.size();
   output << ", Contents: '";
-  for (i = 0; i < str_fields.size() + double_fields.size() + int_fields.size(); i++){
-    output << fields.at(i);
+  
+  for (int def_order =0, i = 0; i < str_fields.size() + double_fields.size() + int_fields.size(); i++,def_order++){
+	if(definitionOrder[def_order] == PAJE_string ||definitionOrder[def_order] == PAJE_color)
+		output << str_fields.at(i);
+	if(definitionOrder[def_order] == PAJE_double || definitionOrder[def_order] == PAJE_date)
+		output << double_fields.at(i);
+	if(definitionOrder[def_order] == PAJE_int )
+		output << int_fields.at(i);
     if (i+1 != str_fields.size() + double_fields.size() + int_fields.size()) output << " ";
   }
   output << "')";

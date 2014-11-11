@@ -37,9 +37,10 @@ union T
 class PajeRastroTraceEvent : public PajeObject {
  private:
   PajeEventDefinition *pajeEventDefinition;
-  std::vector<std::string> str_fields;
+  std::vector<char*>str_fields;
   std::vector<double> double_fields;
   std::vector<int> int_fields;
+  int fieldOrder[10];
   int definitionOrder[10];
 public:
   PajeRastroTraceEvent ();
