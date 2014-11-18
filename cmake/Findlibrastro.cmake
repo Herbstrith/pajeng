@@ -1,15 +1,15 @@
 #
-# Find the PAJENG library
+# Find the LIBRASTRO library
 #
-# PAJENG_INCLUDE_PATH - Directories to include to use PAJENG
-# PAJENG_LIBRARY_PATH - Files to link against to use PAJENG
-# PAJENG_FOUND - When false, don't try to use PAJENG
+# LIBRASTRO_INCLUDE_PATH - Directories to include to use LIBRASTRO
+# LIBRASTRO_LIBRARY_PATH - Files to link against to use LIBRASTRO
+# LIBRASTRO_FOUND - When false, don't try to use LIBRASTRO
 #
-# PAJENG_PATH can be used to make it simpler to find the various include
-# directories and compiled libraries when PAJENG was not installed in the
+# LIBRASTRO_PATH can be used to make it simpler to find the various include
+# directories and compiled libraries when LIBRASTRO was not installed in the
 # usual/well-known directories (e.g. because you made an in tree-source
 # compilation or because you installed it in an "unusual" directory).
-# Just set PAJENG_PATH it to your specific installation directory
+# Just set LIBRASTRO_PATH it to your specific installation directory
 #
 FIND_LIBRARY(LIBRASTRO_LIBRARY
 NAMES rastro
