@@ -21,39 +21,45 @@ PajeRastroTraceEvent::PajeRastroTraceEvent ()
   pajeEventDefinition = NULL;
 }
 
-PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def)
+PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event)
 {
   pajeEventDefinition = def;
-  int i=0;
+
   std::list<PajeField>::iterator itf = def->fields.begin();
   std::list<PajeFieldType>::iterator itt = def->types.begin();
-
+  int i=0;
   //first field is the event type
   itf++;
-  itt++;
   int int_mark =0,double_mark =0,string_mark =0;
   while (itf != def->fields.end()){ 
 	if(*itt == PAJE_string || *itt == PAJE_color){
-		definitionOrder[i]= string_mark;
+    definitionOrder[i] = PAJE_string;    
+    paje_field[*itf] = string_mark;
 		string_mark++;
 	}
 	
 	if(*itt == PAJE_double || *itt == PAJE_date){
-		definitionOrder[i]= double_mark;
-		double_mark++;
+    definitionOrder[i] = PAJE_double;
+    paje_field[*itf] = double_mark;		
+    double_mark++;
 	}
 	
 	if(*itt == PAJE_int){
-		definitionOrder[i]= int_mark;
-		int_mark++;
-	}
-	  
-    fieldOrder[i] = *itf;
+    definitionOrder[i] = PAJE_int;
+    paje_field[*itf] = int_mark;		
+    int_mark++;
+	}  
     itf++;
     itt++;
     i++;
   }
+
   pajeEventDefinition = def;
+
+  memcpy(v_uint32 , event->v_uint32,sizeof(event->v_uint32));
+  memcpy(v_string , event->v_string,sizeof(event->v_string)); 
+  memcpy(v_double , event->v_double,sizeof(event->v_double));  
+  
 }
 
 PajeRastroTraceEvent::~PajeRastroTraceEvent ()
@@ -61,6 +67,9 @@ PajeRastroTraceEvent::~PajeRastroTraceEvent ()
   str_fields.clear();
   double_fields.clear();
   int_fields.clear();
+  free(v_uint32);
+  free(v_string);
+  free(v_double);
 }
 
 PajeEventId PajeRastroTraceEvent::pajeEventId (void)
@@ -87,6 +96,9 @@ void PajeRastroTraceEvent::clear (void)
   str_fields.clear();
   double_fields.clear();
   int_fields.clear();
+  free(v_uint32);
+  free(v_string);
+  free(v_double);
 }
 
 /*
@@ -111,7 +123,7 @@ bool PajeRastroTraceEvent::check (paje_line *line)
   }
 }
 */
-
+/*
 T PajeRastroTraceEvent::valueForField (PajeField field)
 {
   T return_value;
@@ -130,7 +142,26 @@ T PajeRastroTraceEvent::valueForField (PajeField field)
     return return_value;
   }
 }
+*/
+char* PajeRastroTraceEvent::valueForStringField(PajeField field)
+{
+  char* value;  
+  value = v_string[paje_field[field]];
+  return value;
+}
 
+int PajeRastroTraceEvent::valueForIntField(PajeField field)
+{
+  int value;
+  value = v_uint32[paje_field[field]];
+  return value;
+}
+double PajeRastroTraceEvent::valueForDoubleField(PajeField field)
+{
+  double value;
+  value = v_double[paje_field[field]];
+  return value;
+}
 
 
 
@@ -140,17 +171,29 @@ std::string PajeRastroTraceEvent::description (void) const
 {
   std::stringstream output;
   unsigned int i;
-  output << ", Fields: '" << str_fields.size() + double_fields.size() + int_fields.size();
+  int field_count = sizeof(v_string)/sizeof(*v_string) + sizeof(v_double)/sizeof(*v_double) + sizeof(v_uint32)/sizeof(*v_uint32);
+  output << ", Fields: '" << field_count;
   output << ", Contents: '";
-  
-  for (int def_order =0, i = 0; i < str_fields.size() + double_fields.size() + int_fields.size(); i++,def_order++){
+
+  int int_mark =0,double_mark =0,string_mark =0;
+  for (int def_order =0, i = 0; i < field_count ; i++,def_order++){
 	if(definitionOrder[def_order] == PAJE_string ||definitionOrder[def_order] == PAJE_color)
-		output << str_fields.at(i);
-	if(definitionOrder[def_order] == PAJE_double || definitionOrder[def_order] == PAJE_date)
-		output << double_fields.at(i);
-	if(definitionOrder[def_order] == PAJE_int )
-		output << int_fields.at(i);
-    if (i+1 != str_fields.size() + double_fields.size() + int_fields.size()) output << " ";
+  {
+		output << v_string[string_mark];
+    string_mark++;
+  }	
+  if(definitionOrder[def_order] == PAJE_double || definitionOrder[def_order] == PAJE_date)
+  {	
+	  output << v_double[double_mark];
+    double_mark++;
+  }	
+  if(definitionOrder[def_order] == PAJE_int )
+  {		
+    output << v_uint32[int_mark];
+    int_mark++;
+  }    
+  
+  if (i+1 != field_count) output << " ";
   }
   output << "')";
   return output.str();

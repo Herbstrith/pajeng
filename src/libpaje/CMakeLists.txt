@@ -33,7 +33,9 @@ SET(LIBPAJE_HEADERS
   PajeType.h
   PajeValue.h
   PajeDefinitions.h
-  PajeBinaryReader.h)
+  PajeBinaryReader.h
+  PajeRastroTraceEvent.h
+)
 SET(LIBPAJE_SOURCES
   PajeEventDefinition.cc
   PajeTraceEvent.cc
