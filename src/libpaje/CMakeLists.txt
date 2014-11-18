@@ -33,7 +33,9 @@ SET(LIBPAJE_HEADERS
   PajeType.h
   PajeValue.h
   PajeDefinitions.h
-  PajeBinaryReader.h)
+  PajeBinaryReader.h
+  PajeRastroTraceEvent.h
+)
 SET(LIBPAJE_SOURCES
   PajeEventDefinition.cc
   PajeTraceEvent.cc
@@ -54,13 +56,14 @@ SET(LIBPAJE_SOURCES
   PajeException.cc
   PajeDefinitions.cc
   PajeBinaryReader.cc
+  PajeRastroTraceEvent.cc
 )
 
 FIND_PACKAGE(Boost REQUIRED)
 FIND_PACKAGE(librastro REQUIRED)
-
 LINK_DIRECTORIES(${LIBRASTRO_LIBRARY_PATH})
 ADD_LIBRARY(paje_library SHARED ${LIBPAJE_SOURCES})
+INCLUDE_DIRECTORIES(paje_library ${LIBRASTRO_INCLUDE_PATH})
 INCLUDE_DIRECTORIES(paje_library ${Boost_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(paje_library ${LIBRASTRO_INCLUDE_PATH})
 SET_TARGET_PROPERTIES(paje_library PROPERTIES OUTPUT_NAME paje)

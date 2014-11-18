@@ -28,6 +28,7 @@ INCLUDE_DIRECTORIES(${LIBRASTRO_INCLUDE_PATH})
 
 #pj_validade
 ADD_EXECUTABLE(pj_validate pj_validate.cc)
+INCLUDE_DIRECTORIES(pj_validate ${LIBRASTRO_INCLUDE_PATH})
 INCLUDE_DIRECTORIES (pj_validate ${PROJECT_SOURCE_DIR}/src/libpaje/)
 INCLUDE_DIRECTORIES(${pajeng_SOURCE_DIR}/src/fb/)
 TARGET_LINK_LIBRARIES(pj_validate paje_library)

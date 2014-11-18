@@ -1,7 +1,25 @@
+/*
+    This file is part of PajeNG
+
+    PajeNG is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    PajeNG is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Public License for more details.
+
+    You should have received a copy of the GNU Public License
+    along with PajeNG. If not, see <http://www.gnu.org/licenses/>.
+*/
 %{
 #include <stdio.h>
 #include <search.h>
-#include "main.h"
+#include "PajeEventDefinition.h"
+#include "PajeFlexReader.h"
+#include "PajeDefinitions.h"
 
   PajeEventDefinition *eventBeingDefined;
   PajeDefinitions *globalDefinitions;
@@ -13,18 +31,19 @@
     int yylex(void);
     void yyerror (char const *mensagem);
     int yyparse ();
-
-    void lineReset ();
-    void lineAdd (char *str);
-    void lineSend ();
   }
 
+  static void lineReset ();
+  static void lineDef (int identifier);
+  static void lineAdd (char *str);
+  static void lineSend ();
+
   PajeEventDefinition **defsv;
+  int defsv_current_size;
   PajeEventDefinition *def;
   PajeFlexReader *flexReader;
 
-
-  paje_line line; //the current line being read
+  PajeTraceEvent *event; //the current paje trace event (a line) being read
 %}
 
 %union {
@@ -112,7 +131,10 @@ declaration: TK_EVENT_DEF_BEGIN event_name event_id TK_BREAK
              }
              fields TK_EVENT_DEF_END TK_BREAK
              {
-               defsv = (PajeEventDefinition**)realloc (defsv, (def->uniqueIdentifier+1)*sizeof(PajeEventDefinition*));
+               if (def->uniqueIdentifier >= defsv_current_size){
+                 defsv_current_size = def->uniqueIdentifier + 1;
+                 defsv = (PajeEventDefinition**)realloc (defsv, (defsv_current_size)*sizeof(PajeEventDefinition*));
+               }
                defsv[def->uniqueIdentifier] = def;
                def = NULL;
              };
@@ -171,28 +193,32 @@ TK_EVENT_DEF_FIELD_TYPE_COLOR { $$ = PAJE_color; };
 
 events: events event | ;
 event: non_empty_event | empty_event;
-non_empty_event:  { lineReset(); }  TK_INT  { lineAdd($2.str); } arguments TK_BREAK { lineSend (); };
+non_empty_event:  { lineReset(); }  TK_INT  { lineDef ($2.intValue); lineAdd($2.str); } arguments TK_BREAK { lineSend (); };
 empty_event: TK_BREAK; //empty event
 arguments: arguments argument { lineAdd($2.str); } | ;
 argument: TK_STRING { $$ = $1; } | TK_FLOAT { $$ = $1; } | TK_INT { $$ = $1; };
 
 %%
 
-void lineReset ()
+static void lineReset ()
 {
-  line.lineNumber = yylineno;
-  line.word_count = 0;
+  event = new PajeTraceEvent (yylineno);
 }
 
-void lineAdd (char *str)
+static void lineDef (int identifier)
 {
-  line.word[line.word_count++] = strdup(str);
+  event->setDefinition (defsv[identifier]);
 }
 
-void lineSend ()
+static void lineAdd (char *str)
 {
-  int identifier = atoi(line.word[0]);
-  PajeTraceEvent *event = new PajeTraceEvent (defsv[identifier], &line);
+  event->addField (str);
+}
+
+static void lineSend ()
+{
+  if (!event->check (NULL)) exit(1);
   flexReader->outputEntity (event);
-  delete event; 
+  delete event;
+  event = NULL;
 }
