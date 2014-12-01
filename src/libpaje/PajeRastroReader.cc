@@ -16,91 +16,176 @@
 */
 #include "PajeRastroReader.h"
 #include "PajeException.h"
-#include <sys/time.h>
+#include "PajeRastroTraceEvent.h"
+#include <PajeDefinitions.h>
+#include <stdlib.h>
 
-PajeRastroReader::PajeRastroReader (std::string f)
+PajeRastroReader::PajeRastroReader (PajeDefinitions *definitions, char *file_rst)
 {
 
-  char* sync_file = "syncfile";
-  int status = rst_open_file (&rastro, 100000,(char*)f.c_str() ,sync_file);
-    if (status == RST_NOK){
-      fprintf(stderr,
-              "trace file  could not be opened\n"
-               );
-  }
-     
+  defStatus = OUT_DEF;
+  currentEvent = 0;
 
-
-  /*chunkSize = PAJE_DEFAULT_CHUNK_SIZE;
   moreData = true;
-  currentChunk = 0;
-  filename = f;
-  file.open (filename.c_str());
-  if (file.fail()){
-    throw PajeFileReadException (f);
-  }
-  file.seekg (0, std::ios::end);
-  length = file.tellg ();
-  file.seekg (0, std::ios::beg);
+  defs  = definitions;
 
-  input = &file;*/
+  bzero(&rastro, sizeof(rst_rastro_t));
+  //open rst_file
+  int status = rst_open_file (&rastro, 10000000,
+                              file_rst,
+                              (char*)"out.txt");
+                             
+                              
+  if (status == RST_NOK){
+    //TODO: throw Exception
+    printf("error at openning of the rst_file\n");
+  }
+
 }
 
-
-PajeRastroReader::~PajeRastroReader(void)
+PajeRastroReader::~PajeRastroReader ()
 {
-    rst_close (&rastro);
+  eventDefinitions.clear ();
+  /* closing the file */
+  rst_close (&rastro);
 }
 
-/*
-void PajeRastroReader::readNextChunk (void)
+
+paje_line *poti_print_event22 (rst_event_t *event,PajeEventDefinition *eventDefinition)
 {
-  if (input->eof()) moreData = false;
-  if (!moreData) return;
+  int event_id;
+  event_id = event->type;
+  paje_line *paje_line_string = new paje_line;
+  paje_line_string->word_count = 0;		
+  char temp[3];
+  sprintf(temp , "%d" , event_id);
+  paje_line_string->word[0] = temp;
+  std::list<PajeField>::const_iterator ff;
+  ff = eventDefinition->fields.begin();
 
-  //read a chunk
-  PajeData *buffer = new PajeData(chunkSize);
-  input->read (buffer->bytes, chunkSize);
-  current = input->tellg();
-  std::streamoff length = buffer->length = input->gcount ();
+	int f;
+	int double_mark=0,int_mark=0,float_mark=0,string_mark = 0;
+  
+  //paje_line string build-up
+  std::list<PajeFieldType>::iterator i = eventDefinition->types.begin();
+  i++;
+  
+	for(f = 1; f < eventDefinition->fields.size();f++)
+	{
 
-  //read until next \n
-  while (!input->eof()){
-    char c;
-    input->get (c);
-    if (buffer->length + 1 > buffer->capacity){
-      buffer->increaseCapacityOf (100);
-    }
-    buffer->bytes[buffer->length] = c;
-    length = buffer->length++;
-    if (c == '\n') break;
-  }
+		if((*i  ==  PAJE_string || *i ==  PAJE_color) && f == eventDefinition->fields.size()-1){
 
-  if (length > 0){
-    PajeComponent::outputEntity (buffer);
-  }
-  delete buffer;
+      paje_line_string->word[f] = event->v_string[string_mark];
+
+      paje_line_string->word_count++;
+			break;
+
+
+		}
+		if((*i== PAJE_double || *i == PAJE_date) && f== eventDefinition->fields.size()-1){
+       char temp[50];
+       snprintf(temp ,50, "%lf" , event->v_double[double_mark]);
+       paje_line_string->word[f] = temp;
+   // sprintf(temp , "%d" , event_id);
+
+      paje_line_string->word_count++;       
+			break;
+
+		}				
+	
+		if(*i == PAJE_string || *i == PAJE_color){
+      paje_line_string->word[f] = event->v_string[string_mark];
+			string_mark = string_mark +1;
+		}
+		if(*i == PAJE_double || *i == PAJE_date){
+      char temp[50];
+      sprintf(temp , "%lf" , event->v_double[double_mark]);
+      paje_line_string->word[f] = temp;
+      double_mark = double_mark +1;
+  	}
+    paje_line_string->word_count++;
+		i++;
+
+	}
+  
+  paje_line_string->word_count++;
+  paje_line_string->lineNumber=0;  
+  return paje_line_string;
+
 }
 
-bool PajeRastroReader::hasMoreData (void)
+void PajeRastroReader::scanDefinitionLine(u_int32_t definitionArray[], u_int32_t size)
+{         
+                        
+
+  int n = 1;
+                                                //PajeEventId,eventid number,line,defs
+  eventBeingDefined = new PajeEventDefinition((PajeEventId)(definitionArray[0]),(int)(definitionArray[0]), currentEvent,defs);
+ 
+  for (; n < size; n=n+2) {
+      eventBeingDefined->addField((PajeField)(definitionArray[n]),(PajeFieldType)(definitionArray[n+1]),0);
+		}
+
+  eventDefinitions[(int)(definitionArray[0])] = eventBeingDefined;
+
+}
+
+
+PajeTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
+{
+  int eventId = -1;
+  PajeEventDefinition *eventDefinition = NULL;
+  eventId = event->type;
+
+  std::map<u_int32_t,PajeEventDefinition*>::iterator it;
+  it = eventDefinitions.find(eventId);
+  eventDefinition =  it->second;
+  
+  paje_line *pajeLine = poti_print_event22(event, it->second);  
+  int i = 0;
+
+  if (eventDefinition == NULL) { 
+    throw PajeDecodeException ("Event with id '"+std::string("%d",eventId)+"' has not been defined");
+  }
+
+  return new PajeTraceEvent (eventDefinition,pajeLine); 
+}
+
+bool PajeRastroReader::hasMoreData()
 {
   return moreData;
 }
 
-void PajeRastroReader::setUserChunkSize (std::streamoff userChunkSize)
+
+
+
+//called by the PajeThreadReader
+void PajeRastroReader::readNextChunk ()
 {
-  chunkSize = userChunkSize;
+
+
+  /* reading the file */
+  if(rst_decode_event(&rastro, &rst_event)){
+
+    int PajeHeaderEventId = 999;
+    //header definition
+    if(rst_event.type == PajeHeaderEventId ){
+      PajeRastroReader::scanDefinitionLine(rst_event.v_uint32,rst_event.ct.n_uint32);   
+    }
+    //event definition
+    else{
+      PajeTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
+      if (event != NULL){
+        PajeComponent::outputEntity(event);
+        delete event;
+        currentEvent++;
+      }
+    }
+
+  }else{
+    moreData = false;
+  }
+
+
 }
 
-unsigned long long PajeRastroReader::traceSize (void)
-{
-  return length;
-}
-
-unsigned long long PajeRastroReader::traceRead (void)
-{
-  if (!input->eof())
-    return current;
-  else
-    return length;
-}*/

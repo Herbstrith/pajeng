@@ -20,41 +20,43 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "PajeComponent.h"
+#include "PajeEventDefinition.h"
+#include "PajeTraceEvent.h"
+#include "PajeRastroTraceEvent.h"
+#include "PajeDefinitions.h"
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 
 extern "C"
 {
   #include <rastro.h>
+
 }
 
 
-
-
-#define PAJE_DEFAULT_CHUNK_SIZE 1500000
-#define PAJE_DEFAULT_LINE_SIZE 512
-
 class PajeRastroReader : public PajeComponent {
 private:
-  rst_rastro_t rastro;      //the rastro formated file to be read  
-/*std::string filename;
-  std::ifstream file;
-  std::istream *input;
-  std::streamoff chunkSize;
-  int currentChunk;
+  enum { OUT_DEF, IN_DEF } defStatus;
+  PajeEventDefinition *eventBeingDefined;
+  std::map<u_int32_t,PajeEventDefinition*> eventDefinitions;
+  rst_rastro_t rastro;
+   rst_event_t rst_event;
   bool moreData;
-  unsigned long long length;
-  unsigned long long current;
-*/
+  void scanDefinitionLine(u_int32_t definitionArray[], u_int32_t size);
+  PajeTraceEvent *scanEventLine (rst_event_t *event);
+  long long currentEvent;
+  PajeDefinitions *defs;
+
 public:
-  PajeRastroReader(std::string f);
-  ~PajeRastroReader(void);
-  /*void readNextChunk (void);
+  PajeRastroReader (PajeDefinitions *definitions, char *file_rst);
+  ~PajeRastroReader (void);
+  
   bool hasMoreData (void);
-  void setUserChunkSize (std::streamoff userChunkSize);
-  unsigned long long traceSize (void);
-  unsigned long long traceRead (void);*/
+  void readNextChunk ();
 };
 #endif
