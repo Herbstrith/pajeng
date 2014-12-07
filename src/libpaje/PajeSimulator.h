@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "PajeTraceEvent.h"
+#include "PajeRastroTraceEvent.h"
 #include "PajeEvent.h"
 #include "PajeType.h"
 #include "PajeContainer.h"
@@ -45,7 +46,9 @@ private:
 
   double lastKnownTime;
   double stopSimulationAtTime;
-
+  
+  bool useRastroEvent;
+  
   void init (void);
 
 private:
@@ -60,6 +63,7 @@ public:
   PajeSimulator();
   PajeSimulator(double stopat);
   PajeSimulator(double stopat, int ignoreIncompleteLinks);
+  PajeSimulator (bool setRastroEvent);
   ~PajeSimulator();
   void report (void);
   bool keepSimulating (void);

@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Public License
     along with PajeNG. If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef __PAJETRACEEVENT_H__
-#define __PAJETRACEEVENT_H__
+#ifndef __PAJERASTROTRACEEVENT_H__
+#define __PAJERASTROTRACEEVENT_H__
 #include <map>
 #include <string>
 #include <iostream>
@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "PajeTraceEvent.h"
 #include "PajeEventDefinition.h"
 #include "PajeObject.h"
 
@@ -42,7 +43,7 @@ union T
     double d;
 };
 
-class PajeRastroTraceEvent : public PajeObject {
+class PajeRastroTraceEvent : public PajeTraceEvent {
  private:
   PajeEventDefinition *pajeEventDefinition;
   

@@ -40,6 +40,13 @@ PajeSimulator::PajeSimulator (double stopat, int ignore)
   init ();
 }
 
+PajeSimulator::PajeSimulator (bool setRastroEvent)
+{
+  useRastroEvent = setRastroEvent;
+  stopSimulationAtTime = -1;
+  init ();
+}
+
 void PajeSimulator::init (void)
 {
   invocation[PajeDefineContainerTypeEventId] = &PajeSimulator::pajeDefineContainerType;
@@ -152,18 +159,34 @@ PajeSimulator::~PajeSimulator ()
 
 void PajeSimulator::inputEntity (PajeObject *data)
 {
-  //get event, set last known time
-  PajeTraceEvent *event = (PajeTraceEvent*)data;
-  setLastKnownTime (event);
-  //change the simulated behavior according to the event
-  PajeEventId eventId = event->pajeEventId();
-  if (eventId < PajeEventIdCount){
-    if (invocation[eventId]){
-      CALL_MEMBER_PAJE_SIMULATOR(*this,invocation[eventId])(event);
-    }
+  if(!useRastroEvent){
+    //get event, set last known time
+	  PajeTraceEvent *event = (PajeTraceEvent*)data;
+	  setLastKnownTime (event);
+	  //change the simulated behavior according to the event
+	  PajeEventId eventId = event->pajeEventId();
+	  if (eventId < PajeEventIdCount){
+      if (invocation[eventId]){
+        CALL_MEMBER_PAJE_SIMULATOR(*this,invocation[eventId])(event);
+      }
+      }else{
+      throw PajeSimulationException ("Unknow event id.");
+      }
   }else{
-    throw PajeSimulationException ("Unknow event id.");
+    //get event, set last known time
+    PajeRastroTraceEvent *rastroEvent = (PajeRastroTraceEvent*)data;
+    setLastKnownTime (rastroEvent);
+    //change the simulated behavior according to the event
+	  PajeEventId eventId = rastroEvent->pajeEventId();
+    if (eventId < PajeEventIdCount){
+      if (invocation[eventId]){
+        CALL_MEMBER_PAJE_SIMULATOR(*this,invocation[eventId])(rastroEvent);
+      }
+      }else{
+        throw PajeSimulationException ("Unknow event id.");
+      }
   }
+  
 }
 
 void PajeSimulator::startReading (void)
