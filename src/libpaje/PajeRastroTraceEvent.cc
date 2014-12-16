@@ -25,32 +25,32 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
 {
   pajeEventDefinition = def;
 
-  std::list<PajeField>::iterator itf = def->fields.begin();
-  std::list<PajeFieldType>::iterator itt = def->types.begin();
+  std::list<PajeField>::iterator itFields = def->fields.begin();
+  std::list<PajeFieldType>::iterator itTypes = def->types.begin();
   int i=0;
   //first field is the event type
-  itf++;
+  itFields++;
   int int_mark =0,double_mark =0,string_mark =0;
-  while (itf != def->fields.end()){ 
-	if(*itt == PAJE_string || *itt == PAJE_color){
+  while (itFields != def->fields.end()){ 
+	if(*itTypes == PAJE_string || *itTypes == PAJE_color){
     definitionOrder[i] = PAJE_string;    
-    paje_field[*itf] = string_mark;
+    paje_field[*itFields] = string_mark;
 		string_mark++;
 	}
 	
-	if(*itt == PAJE_double || *itt == PAJE_date){
+	if(*itTypes == PAJE_double || *itTypes == PAJE_date){
     definitionOrder[i] = PAJE_double;
-    paje_field[*itf] = double_mark;		
+    paje_field[*itFields] = double_mark;		
     double_mark++;
 	}
 	
-	if(*itt == PAJE_int){
+	if(*itTypes == PAJE_int){
     definitionOrder[i] = PAJE_int;
-    paje_field[*itf] = int_mark;		
+    paje_field[*itFields] = int_mark;		
     int_mark++;
 	}  
-    itf++;
-    itt++;
+    itFields++;
+    itTypes++;
     i++;
   }
 

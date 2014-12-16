@@ -47,6 +47,7 @@ private:
   double lastKnownTime;
   double stopSimulationAtTime;
   
+  //if using the rastro trace event
   bool useRastroEvent;
   
   void init (void);
