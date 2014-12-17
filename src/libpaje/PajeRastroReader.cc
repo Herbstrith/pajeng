@@ -131,7 +131,7 @@ void PajeRastroReader::scanDefinitionLine(u_int32_t definitionArray[], u_int32_t
 }
 
 
-PajeTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
+PajeRastroTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
 {
   int eventId = -1;
   PajeEventDefinition *eventDefinition = NULL;
@@ -141,14 +141,14 @@ PajeTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
   it = eventDefinitions.find(eventId);
   eventDefinition =  it->second;
   
-  paje_line *pajeLine = poti_print_event22(event, it->second);  
+  //paje_line *pajeLine = poti_print_event22(event, it->second);  
   int i = 0;
 
   if (eventDefinition == NULL) { 
     throw PajeDecodeException ("Event with id '"+std::string("%d",eventId)+"' has not been defined");
   }
 
-  return new PajeTraceEvent (eventDefinition,pajeLine); 
+  return new PajeRastroTraceEvent (eventDefinition,event); 
 }
 
 bool PajeRastroReader::hasMoreData()
@@ -174,7 +174,7 @@ void PajeRastroReader::readNextChunk ()
     }
     //event definition
     else{
-      PajeTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
+      PajeRastroTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
       if (event != NULL){
         PajeComponent::outputEntity(event);
         delete event;

@@ -48,7 +48,7 @@ private:
    rst_event_t rst_event;
   bool moreData;
   void scanDefinitionLine(u_int32_t definitionArray[], u_int32_t size);
-  PajeTraceEvent *scanEventLine (rst_event_t *event);
+  PajeRastroTraceEvent *scanEventLine (rst_event_t *event);
   long long currentEvent;
   PajeDefinitions *defs;
 

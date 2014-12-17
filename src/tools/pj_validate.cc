@@ -24,6 +24,7 @@
 #include "PajeSimulator.h"
 #include "PajeException.h"
 #include "PajeBinaryReader.h"
+#include "PajeRastroReader.h"
 #include <argp.h>
 
 #define VALIDATE_INPUT_SIZE 2
@@ -35,7 +36,8 @@ static struct argp_option options[] = {
   {"quiet", 'q', 0, OPTION_ARG_OPTIONAL, "Be quiet"},
   {"time", 't', 0, OPTION_ARG_OPTIONAL, "Print number of seconds to simulate input"},
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
-  {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
+ // {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
+  {"rastroreader", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input using the proper rastro reader"},
   { 0 }
 };
 
@@ -47,6 +49,7 @@ struct arguments {
   int time;
   int flex;
   int rastro;
+  int rastroReader;
 };
 
 static error_t parse_options (int key, char *arg, struct argp_state *state)
@@ -57,7 +60,8 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 't': arguments->time = 1; break;
   case 'q': arguments->quiet = 1; break;
   case 'f': arguments->flex = 1; break;
-  case 'r': arguments->rastro = 1;break;
+  //case 'r': arguments->rastro = 1;break;
+  case 'r': arguments->rastroReader = 1;break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {
       /* Too many arguments. */
@@ -106,50 +110,60 @@ int main (int argc, char **argv)
     //alloc reader
     if (arguments.flex){
       if (arguments.input_size == 0){
-	reader = new PajeFlexReader(definitions);
+        reader = new PajeFlexReader(definitions);
       }else{
-	std::string filename = arguments.input[0];
-	reader = new PajeFlexReader(filename, definitions);
+        std::string filename = arguments.input[0];
+        reader = new PajeFlexReader(filename, definitions);
       }
     }else{
-		if(arguments.rastro)
-		{
-			reader = new PajeBinaryReader(definitions,arguments.input[0]);
-		}
-		else
-		{
-		  if (arguments.input_size == 0){
-			reader = new PajeFileReader();
-		  }else{
-			reader = new PajeFileReader (std::string(arguments.input[0]));
-		  }
-	}
+      if(arguments.rastro)
+      {
+        reader = new PajeBinaryReader(definitions,arguments.input[0]);
+      }
+      if(arguments.rastroReader)
+      {
+        reader = new PajeRastroReader(definitions,arguments.input[0]);
+      }
+      else
+      {
+        if (arguments.input_size == 0){
+          reader = new PajeFileReader();
+        }else{
+          reader = new PajeFileReader (std::string(arguments.input[0]));
+        }
+      }
     }
-    
+
 
     //alloc decoder and simulator
     if (!arguments.flex){
       decoder = new PajeEventDecoder(definitions);
     }
     simulator = new PajeSimulator ();
-	
-	if(arguments.rastro)
+    if(arguments.rastro)
     {
-       reader->setOutputComponent (simulator);
-		simulator->setInputComponent (reader);
-	}
-	else{
-    //connect components
-		if (arguments.flex){
-		  reader->setOutputComponent (simulator);
-		  simulator->setInputComponent (reader);
-		}else{
-		  reader->setOutputComponent (decoder);
-		  decoder->setInputComponent (reader);
-		  decoder->setOutputComponent (simulator);
-		  simulator->setInputComponent (decoder);
+      reader->setOutputComponent (simulator);
+      simulator->setInputComponent (reader);
+    }
+    if(arguments.rastroReader)
+		{
+			reader->setOutputComponent (simulator);
+      simulator->setInputComponent (reader);
 		}
-	}
+	
+    else{
+      //connect components
+      if (arguments.flex){
+        reader->setOutputComponent (simulator);
+        simulator->setInputComponent (reader);
+      }else{
+        reader->setOutputComponent (decoder);
+        decoder->setInputComponent (reader);
+        decoder->setOutputComponent (simulator);
+        simulator->setInputComponent (decoder);
+      }
+    }
+  
   }catch (PajeException& e){
     e.reportAndExit ();
   }
