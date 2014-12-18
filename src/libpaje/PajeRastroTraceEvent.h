@@ -72,7 +72,7 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
   void addField (int field);
   void clear (void);
   bool check (paje_line *line);
-  T valueForField (PajeField field);
+  //T valueForField (PajeField field);
   std::string valueForExtraField (std::string fieldName);
   std::string description (void) const;
   PajeEventDefinition *definition (void);

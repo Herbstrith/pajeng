@@ -23,18 +23,21 @@ int ignoreIncompleteLinks = 0;
 
 PajeSimulator::PajeSimulator ()
 {
+  useRastroEvent = false;
   stopSimulationAtTime = -1;
   init ();
 }
 
 PajeSimulator::PajeSimulator (double stopat)
 {
+  useRastroEvent = false;
   stopSimulationAtTime = stopat;
   init ();
 }
 
 PajeSimulator::PajeSimulator (double stopat, int ignore)
 {
+  useRastroEvent = false;
   stopSimulationAtTime = stopat;
   ignoreIncompleteLinks = ignore;
   init ();
@@ -117,10 +120,13 @@ bool PajeSimulator::keepSimulating (void)
 
 void PajeSimulator::setLastKnownTime (PajeTraceEvent *event)
 {
-  std::string time = event->valueForField (PAJE_Time);
-  if (time.length()){
-    double evttime = atof(time.c_str());
-    lastKnownTime = evttime;
+  if(!useRastroEvent)
+  {
+    std::string time = event->valueForField (PAJE_Time);
+    if (time.length()){
+      double evttime = atof(time.c_str());
+      lastKnownTime = evttime;
+    }
   }
 }
 
@@ -173,11 +179,15 @@ void PajeSimulator::inputEntity (PajeObject *data)
       throw PajeSimulationException ("Unknow event id.");
       }
   }else{
+    printf("\n rastro reader");
     //get event, set last known time
-    PajeRastroTraceEvent *rastroEvent = (PajeRastroTraceEvent*)data;
+    PajeRastroTraceEvent *rastroEvent = (PajeRastroTraceEvent*)data;    
+
     setLastKnownTime (rastroEvent);
+
     //change the simulated behavior according to the event
-	  PajeEventId eventId = rastroEvent->pajeEventId();
+	  PajeEventId eventId = rastroEvent->pajeEventId();  
+
     if (eventId < PajeEventIdCount){
       if (invocation[eventId]){
         CALL_MEMBER_PAJE_SIMULATOR(*this,invocation[eventId])(rastroEvent);
@@ -221,8 +231,11 @@ void PajeSimulator::pajeDefineContainerType (PajeTraceEvent *event)
     type = RastrotraceEvent->valueForStringField (PAJE_Type);
     alias = RastrotraceEvent->valueForStringField (PAJE_Alias);
   }
+  
+
   //search for parent type
   PajeType *containerType = typeMap[type];
+
   if (!containerType){
     std::stringstream line;
     line << *event;
@@ -496,7 +509,6 @@ void PajeSimulator::pajeCreateContainer (PajeTraceEvent *traceEvent)
     name = RastrotraceEvent->valueForStringField (PAJE_Name);
     alias = RastrotraceEvent->valueForStringField (PAJE_Alias);
   }
-  
 
   //search the container type for the new container
   PajeType *type = typeMap[typestr];

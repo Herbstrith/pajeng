@@ -51,68 +51,6 @@ PajeRastroReader::~PajeRastroReader ()
 }
 
 
-paje_line *poti_print_event22 (rst_event_t *event,PajeEventDefinition *eventDefinition)
-{
-  int event_id;
-  event_id = event->type;
-  paje_line *paje_line_string = new paje_line;
-  paje_line_string->word_count = 0;		
-  char temp[3];
-  sprintf(temp , "%d" , event_id);
-  paje_line_string->word[0] = temp;
-  std::list<PajeField>::const_iterator ff;
-  ff = eventDefinition->fields.begin();
-
-	int f;
-	int double_mark=0,int_mark=0,float_mark=0,string_mark = 0;
-  
-  //paje_line string build-up
-  std::list<PajeFieldType>::iterator i = eventDefinition->types.begin();
-  i++;
-  
-	for(f = 1; f < eventDefinition->fields.size();f++)
-	{
-
-		if((*i  ==  PAJE_string || *i ==  PAJE_color) && f == eventDefinition->fields.size()-1){
-
-      paje_line_string->word[f] = event->v_string[string_mark];
-
-      paje_line_string->word_count++;
-			break;
-
-
-		}
-		if((*i== PAJE_double || *i == PAJE_date) && f== eventDefinition->fields.size()-1){
-       char temp[50];
-       snprintf(temp ,50, "%lf" , event->v_double[double_mark]);
-       paje_line_string->word[f] = temp;
-   // sprintf(temp , "%d" , event_id);
-
-      paje_line_string->word_count++;       
-			break;
-
-		}				
-	
-		if(*i == PAJE_string || *i == PAJE_color){
-      paje_line_string->word[f] = event->v_string[string_mark];
-			string_mark = string_mark +1;
-		}
-		if(*i == PAJE_double || *i == PAJE_date){
-      char temp[50];
-      sprintf(temp , "%lf" , event->v_double[double_mark]);
-      paje_line_string->word[f] = temp;
-      double_mark = double_mark +1;
-  	}
-    paje_line_string->word_count++;
-		i++;
-
-	}
-  
-  paje_line_string->word_count++;
-  paje_line_string->lineNumber=0;  
-  return paje_line_string;
-
-}
 
 void PajeRastroReader::scanDefinitionLine(u_int32_t definitionArray[], u_int32_t size)
 {         
@@ -127,7 +65,7 @@ void PajeRastroReader::scanDefinitionLine(u_int32_t definitionArray[], u_int32_t
 		}
 
   eventDefinitions[(int)(definitionArray[0])] = eventBeingDefined;
-
+ // printf("\n header id %d",definitionArray[0]);
 }
 
 
@@ -162,8 +100,6 @@ bool PajeRastroReader::hasMoreData()
 //called by the PajeThreadReader
 void PajeRastroReader::readNextChunk ()
 {
-
-
   /* reading the file */
   if(rst_decode_event(&rastro, &rst_event)){
 
@@ -181,7 +117,6 @@ void PajeRastroReader::readNextChunk ()
         currentEvent++;
       }
     }
-
   }else{
     moreData = false;
   }

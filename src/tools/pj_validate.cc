@@ -36,8 +36,8 @@ static struct argp_option options[] = {
   {"quiet", 'q', 0, OPTION_ARG_OPTIONAL, "Be quiet"},
   {"time", 't', 0, OPTION_ARG_OPTIONAL, "Print number of seconds to simulate input"},
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
- // {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
-  {"rastroreader", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input using the proper rastro reader"},
+  {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
+  {"rastroreader", 'z', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input using the proper rastro reader"},
   { 0 }
 };
 
@@ -60,8 +60,8 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 't': arguments->time = 1; break;
   case 'q': arguments->quiet = 1; break;
   case 'f': arguments->flex = 1; break;
-  //case 'r': arguments->rastro = 1;break;
-  case 'r': arguments->rastroReader = 1;break;
+  case 'r': arguments->rastro = 1;break;
+  case 'z': arguments->rastroReader = 1;break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {
       /* Too many arguments. */
@@ -92,6 +92,7 @@ static double gettime (void)
 
 int main (int argc, char **argv)
 {
+  printf("here");
   struct arguments arguments;
   bzero (&arguments, sizeof(struct arguments));
   if (argp_parse (&argp, argc, argv, 0, 0, &arguments) == ARGP_KEY_ERROR){
@@ -107,6 +108,7 @@ int main (int argc, char **argv)
   PajeDefinitions *definitions = new PajeDefinitions (arguments.noStrict ? false : true); 
 
   try {
+
     //alloc reader
     if (arguments.flex){
       if (arguments.input_size == 0){
@@ -139,6 +141,7 @@ int main (int argc, char **argv)
     if (!arguments.flex){
       decoder = new PajeEventDecoder(definitions);
     }
+    
     simulator = new PajeSimulator ();
     if(arguments.rastro)
     {
@@ -147,6 +150,7 @@ int main (int argc, char **argv)
     }
     if(arguments.rastroReader)
 		{
+      simulator = new PajeSimulator (true);
 			reader->setOutputComponent (simulator);
       simulator->setInputComponent (reader);
 		}

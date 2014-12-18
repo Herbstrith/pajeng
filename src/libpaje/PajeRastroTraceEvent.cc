@@ -36,18 +36,23 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
     definitionOrder[i] = PAJE_string;    
     paje_field[*itFields] = string_mark;
 		string_mark++;
+    //printf("\n string field");
 	}
 	
 	if(*itTypes == PAJE_double || *itTypes == PAJE_date){
     definitionOrder[i] = PAJE_double;
     paje_field[*itFields] = double_mark;		
     double_mark++;
+      //printf("\n double field");
+
 	}
 	
 	if(*itTypes == PAJE_int){
     definitionOrder[i] = PAJE_int;
     paje_field[*itFields] = int_mark;		
     int_mark++;
+      //  printf("\n int field");
+
 	}  
     itFields++;
     itTypes++;
@@ -145,7 +150,7 @@ T PajeRastroTraceEvent::valueForField (PajeField field)
 */
 char* PajeRastroTraceEvent::valueForStringField(PajeField field)
 {
-  char* value;  
+  char* value = "-1";  
   value = v_string[paje_field[field]];
   return value;
 }
@@ -162,8 +167,6 @@ double PajeRastroTraceEvent::valueForDoubleField(PajeField field)
   value = v_double[paje_field[field]];
   return value;
 }
-
-
 
 
 
