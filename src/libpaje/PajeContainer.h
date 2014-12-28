@@ -24,6 +24,7 @@
 #include "PajeTraceEvent.h"
 #include "PajeEvent.h"
 #include "PajeEntity.h"
+#include "PajeRastroTraceEvent.h"
 
 class PajeContainer;
 class PajeEvent;
@@ -33,7 +34,8 @@ private:
   double stopSimulationAtTime;
   void (PajeContainer::*invocation[PajeEventIdCount])(PajeEvent *);
   bool _destroyed;
-
+  bool usingRastroEvent;
+  
 public:
   std::string _alias;
   std::map<std::string,PajeContainer*> children;
@@ -53,6 +55,8 @@ private:
 public:
   PajeContainer (double time, std::string name, std::string alias, PajeContainer *parent, PajeType *type, PajeTraceEvent *event);
   PajeContainer (double time, std::string name, std::string alias, PajeContainer *parent, PajeType *type, PajeTraceEvent *event, double stopat);
+  PajeContainer (double time, std::string name, std::string alias, PajeContainer *parent, PajeType *type, PajeRastroTraceEvent *event, bool useRastroEvent);
+  PajeContainer (double time, std::string name, std::string alias, PajeContainer *parent, PajeType *type, PajeRastroTraceEvent *event, double stopat, bool useRastroEvent);
   ~PajeContainer ();
   int numberOfEntities (void); //recursive
   std::string description (void) const;
@@ -65,9 +69,11 @@ public:
 
   //entry method
   void demuxer (PajeEvent *event);
-
+  void rastroDemuxer(PajeEvent *event);
   //Simulator events (not treated by demuxer yet)
   PajeContainer *pajeCreateContainer (double time, PajeType *type, PajeTraceEvent *event, double stopat);
+  PajeContainer *pajeCreateContainer (double time, PajeType *type, PajeRastroTraceEvent *event, double stopat);
+
   void pajeDestroyContainer (double time, PajeEvent *event);
 private:
   //Simulator events

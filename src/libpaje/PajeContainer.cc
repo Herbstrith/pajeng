@@ -26,6 +26,7 @@ PajeContainer::PajeContainer (double time, std::string name, std::string alias, 
 {
   stopSimulationAtTime = -1;
   init (alias, parent);
+  usingRastroEvent = false;
 }
 
 PajeContainer::PajeContainer (double time, std::string name, std::string alias, PajeContainer *parent, PajeType *type, PajeTraceEvent *event, double stopat)
@@ -33,6 +34,25 @@ PajeContainer::PajeContainer (double time, std::string name, std::string alias, 
 {
   stopSimulationAtTime = stopat;
   init (alias, parent);
+  usingRastroEvent = false;
+}
+
+//New constructor for using the rastroTraceEvent
+PajeContainer::PajeContainer (double time, std::string name, std::string alias, PajeContainer *parent, PajeType *type, PajeRastroTraceEvent *event, bool useRastroEvent)
+  : PajeNamedEntity (parent, type, time, name, event)
+{
+  stopSimulationAtTime = -1;
+  init (alias, parent);
+  usingRastroEvent = useRastroEvent;
+}
+
+PajeContainer::PajeContainer (double time, std::string name, std::string alias, PajeContainer *parent, PajeType *type, PajeRastroTraceEvent *event, double stopat,bool useRastroEvent)
+  : PajeNamedEntity (parent, type, time, name, event)
+{
+  stopSimulationAtTime = stopat;
+  init (alias, parent);
+  usingRastroEvent = useRastroEvent;
+
 }
 
 PajeContainer::~PajeContainer ()
@@ -58,6 +78,7 @@ PajeContainer::~PajeContainer ()
 void PajeContainer::init (std::string alias, PajeContainer *parent)
 {
   _alias = alias;
+
   _destroyed = false;
   if (parent){
     depth = parent->depth + 1;
@@ -210,6 +231,38 @@ void PajeContainer::demuxer (PajeEvent *event)
 
   //change the simulated behavior according to the event
   PajeEventId eventId = event->traceEvent()->pajeEventId();
+  if (eventId < PajeEventIdCount){
+    if (invocation[eventId]){
+      CALL_MEMBER_PAJE_CONTAINER(*this,invocation[eventId])(event);
+    }else{
+      throw PajeSimulationException ("Asked to simulate something I don't know how to simulate");
+    }
+  }else{
+    throw PajeSimulationException ("Unknow event id.");
+  }
+
+  //update container endtime
+  setEndTime (event->time());
+}
+
+void PajeContainer::rastroDemuxer (PajeEvent *event)
+{
+  //check if I'm stopped
+  if (_destroyed){
+    return;
+  }
+
+  double lastKnownTime = event->time();
+  //stop the simulation before the end
+  if (stopSimulationAtTime != -1){
+    if (lastKnownTime > stopSimulationAtTime){
+      pajeDestroyContainer (stopSimulationAtTime, event);
+      return;
+    }
+  }
+
+  //change the simulated behavior according to the event
+  PajeEventId eventId = event->rastroTraceEvent()->pajeEventId();
   if (eventId < PajeEventIdCount){
     if (invocation[eventId]){
       CALL_MEMBER_PAJE_CONTAINER(*this,invocation[eventId])(event);
@@ -706,6 +759,26 @@ PajeContainer *PajeContainer::pajeCreateContainer (double time, PajeType *type, 
   children[newContainer->identifier()] = newContainer;
   return newContainer;
 }
+
+//ADDED FOR USE WITH THE RASTRO READER
+PajeContainer *PajeContainer::pajeCreateContainer (double time, PajeType *type, PajeRastroTraceEvent *event, double stopat)
+{
+  std::string name = event->valueForStringField (PAJE_Name);
+  std::string alias = event->valueForStringField (PAJE_Alias);
+
+  if (type->nature() != PAJE_ContainerType){
+    std::stringstream eventdesc;
+    eventdesc << *event;
+    throw PajeSimulationException ("Trying to create a container of a type that is not a container type in "+eventdesc.str());
+  }
+
+  PajeContainer *newContainer = new PajeContainer (time, name, alias, this, type, event, stopat,true);
+
+  children[newContainer->identifier()] = newContainer;
+  return newContainer;
+}
+
+
 
 void PajeContainer::pajeDestroyContainer (double time, PajeEvent *event)
 {

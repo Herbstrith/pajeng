@@ -19,6 +19,7 @@
 #include "PajeObject.h"
 #include "PajeType.h"
 #include "PajeTraceEvent.h"
+#include "PajeRastroTraceEvent.h"
 
 class PajeContainer;
 
@@ -68,7 +69,10 @@ private:
 
 public:
   PajeEntity (PajeContainer *container, PajeType *type, PajeTraceEvent *event);
+  PajeEntity (PajeContainer *container, PajeType *type, PajeRastroTraceEvent *event);
+
   void addPajeTraceEvent (PajeTraceEvent *event);
+  void addPajeTraceEvent (PajeRastroTraceEvent *event);
   PajeContainer *container (void) const;
   PajeType *type (void) const;
   std::string name (void) const;
@@ -103,6 +107,8 @@ private:
 
 public:
   PajeSingleTimedEntity (PajeContainer *container, PajeType *type, double time, PajeTraceEvent *event);
+  PajeSingleTimedEntity (PajeContainer *container, PajeType *type, double time, PajeRastroTraceEvent *event);
+
   double time (void) const;
   double startTime (void) const;
   double firstTime (void) const;
@@ -123,6 +129,8 @@ private:
 
 public:
   PajeDoubleTimedEntity (PajeContainer *container, PajeType *type, double time, PajeTraceEvent *event);
+  PajeDoubleTimedEntity (PajeContainer *container, PajeType *type, double time, PajeRastroTraceEvent *event);
+
   double endTime (void) const;
   double lastTime (void) const;
   void setEndTime (double endTime);
@@ -152,6 +160,8 @@ private:
 
 public:
   PajeNamedEntity (PajeContainer *container, PajeType *type, double time, std::string name, PajeTraceEvent *event);
+  PajeNamedEntity (PajeContainer *container, PajeType *type, double time, std::string name, PajeRastroTraceEvent *event);
+
   std::string name (void) const;
 };
 

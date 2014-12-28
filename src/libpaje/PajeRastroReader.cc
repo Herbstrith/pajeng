@@ -102,7 +102,6 @@ void PajeRastroReader::readNextChunk ()
 {
   /* reading the file */
   if(rst_decode_event(&rastro, &rst_event)){
-
     int PajeHeaderEventId = 999;
     //header definition
     if(rst_event.type == PajeHeaderEventId ){
@@ -110,12 +109,16 @@ void PajeRastroReader::readNextChunk ()
     }
     //event definition
     else{
-      PajeRastroTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
+      PajeRastroTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);           
       if (event != NULL){
+        //printf("call simulator \n");
+
         PajeComponent::outputEntity(event);
-        delete event;
+      //  delete event; //mem_free error here
         currentEvent++;
+       
       }
+       //printf("finished read event %d \n",currentEvent);
     }
   }else{
     moreData = false;

@@ -30,33 +30,38 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
   int i=0;
   //first field is the event type
   itFields++;
+  itTypes++;
   int int_mark =0,double_mark =0,string_mark =0;
+  
+   //   printf("\n list size %d %d %d\n ", def->fields.size(),*itFields,*itTypes);
+
+
+  
   while (itFields != def->fields.end()){ 
-	if(*itTypes == PAJE_string || *itTypes == PAJE_color){
-    definitionOrder[i] = PAJE_string;    
-    paje_field[*itFields] = string_mark;
-		string_mark++;
-    //printf("\n string field");
-	}
-	
-	if(*itTypes == PAJE_double || *itTypes == PAJE_date){
-    definitionOrder[i] = PAJE_double;
-    paje_field[*itFields] = double_mark;		
-    double_mark++;
-      //printf("\n double field");
+  
+    
+    if(*itTypes == PAJE_string || *itTypes == PAJE_color){
+      definitionOrder[i] = PAJE_string;    
+      paje_field[*itFields] = string_mark;
+      string_mark++;
+    }
+    
+    if(*itTypes == PAJE_double || *itTypes == PAJE_date){
+      definitionOrder[i] = PAJE_double;
+      paje_field[*itFields] = double_mark;		
+      double_mark++;
 
-	}
-	
-	if(*itTypes == PAJE_int){
-    definitionOrder[i] = PAJE_int;
-    paje_field[*itFields] = int_mark;		
-    int_mark++;
-      //  printf("\n int field");
+    }
+    
+    if(*itTypes == PAJE_int){
+      definitionOrder[i] = PAJE_int;
+      paje_field[*itFields] = int_mark;		
+      int_mark++;
 
-	}  
-    itFields++;
-    itTypes++;
-    i++;
+    }  
+      itFields++;
+      itTypes++;
+      i++;
   }
 
   pajeEventDefinition = def;
@@ -168,6 +173,10 @@ double PajeRastroTraceEvent::valueForDoubleField(PajeField field)
   return value;
 }
 
+std::string PajeRastroTraceEvent::valueForExtraField (std::string fieldName)
+{
+  return NULL;
+}
 
 
 std::string PajeRastroTraceEvent::description (void) const

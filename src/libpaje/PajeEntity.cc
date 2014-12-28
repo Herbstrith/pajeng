@@ -25,6 +25,14 @@ PajeEntity::PajeEntity (PajeContainer *container, PajeType *type, PajeTraceEvent
   addPajeTraceEvent (event);
 }
 
+PajeEntity::PajeEntity (PajeContainer *container, PajeType *type, PajeRastroTraceEvent *event)
+{
+  _container = container;
+  _type = type;
+
+  addPajeTraceEvent (event);
+}
+
 void PajeEntity::addPajeTraceEvent (PajeTraceEvent *event)
 {
   if (!event) return;
@@ -49,6 +57,32 @@ void PajeEntity::addPajeTraceEvent (PajeTraceEvent *event)
     }
   }
 }
+
+void PajeEntity::addPajeTraceEvent (PajeRastroTraceEvent *event)
+{
+  if (!event) return;
+
+  PajeEventDefinition *def = event->definition();
+  std::vector<std::string> extra = def->extraFields();
+  std::vector<std::string>::iterator it;
+  for (it = extra.begin(); it != extra.end(); it++){
+    std::string fieldName = *it;
+    std::string value = event->valueForExtraField (fieldName);
+
+    //check if fieldName already exists
+    if (extraFields.count(fieldName)){
+      //if it does, check if value is NOT the same
+      if (extraFields[fieldName] != value){
+        std::stringstream line;
+        line << *event;
+        throw PajeDecodeException ("When treating event "+line.str()+", the value for "+fieldName+" is "+extraFields[fieldName]+", but it is different from "+value);
+      }
+    }else{
+      extraFields[fieldName] = value;
+    }
+  }
+}
+
 
 PajeContainer *PajeEntity::container (void) const
 {
@@ -142,6 +176,12 @@ PajeSingleTimedEntity::PajeSingleTimedEntity (PajeContainer *container, PajeType
   _stime = time;
 }
 
+PajeSingleTimedEntity::PajeSingleTimedEntity (PajeContainer *container, PajeType *type, double time, PajeRastroTraceEvent *event)
+  : PajeEntity (container, type, event)
+{
+  _stime = time;
+}
+
 double PajeSingleTimedEntity::time (void) const
 {
   return _stime;
@@ -191,6 +231,12 @@ PajeDoubleTimedEntity::PajeDoubleTimedEntity (PajeContainer *container, PajeType
   _etime = -1;
 }
 
+PajeDoubleTimedEntity::PajeDoubleTimedEntity (PajeContainer *container, PajeType *type, double time, PajeRastroTraceEvent *event)
+  : PajeSingleTimedEntity (container, type, time, event)
+{
+  _etime = -1;
+}
+
 void PajeDoubleTimedEntity::setEndTime (double endTime)
 {
   _etime = endTime;
@@ -233,6 +279,12 @@ PajeValue *PajeValueEntity::value (void) const
  * PajeNamedEntity
  */
 PajeNamedEntity::PajeNamedEntity (PajeContainer *container, PajeType *type, double time, std::string name, PajeTraceEvent *event)
+  : PajeDoubleTimedEntity (container, type, time, event)
+{
+  _name = name;
+}
+
+PajeNamedEntity::PajeNamedEntity (PajeContainer *container, PajeType *type, double time, std::string name, PajeRastroTraceEvent *event)
   : PajeDoubleTimedEntity (container, type, time, event)
 {
   _name = name;

@@ -31,9 +31,28 @@ PajeEvent::PajeEvent (PajeTraceEvent *event, PajeContainer *container, PajeType 
   _time = atof(t.c_str());
 }
 
+PajeEvent::PajeEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type)
+{
+  _rastroEvent = event;
+  _container = container;
+  _type = type;
+  
+  //extracing time
+  double t = _rastroEvent->valueForDoubleField (PAJE_Time);
+  if (t < 0){
+    PajeSimulationException ("Can't get time from trace event.");
+  }
+  _time = t;
+}
+
 PajeTraceEvent *PajeEvent::traceEvent (void)
 {
   return _event;
+}
+
+PajeRastroTraceEvent *PajeEvent::rastroTraceEvent (void)
+{
+  return _rastroEvent;
 }
 
 PajeContainer *PajeEvent::container (void)
@@ -82,6 +101,12 @@ PajeCategorizedEvent::PajeCategorizedEvent (PajeTraceEvent *event, PajeContainer
   _value = value;
 }
 
+PajeCategorizedEvent::PajeCategorizedEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
+  : PajeEvent (event, container, type)
+{
+  _value = value;
+}
+
 PajeValue *PajeCategorizedEvent::value (void)
 {
   return _value;
@@ -108,6 +133,12 @@ PajeVariableEvent::PajeVariableEvent (PajeTraceEvent *event, PajeContainer *cont
   _doubleValue = value;
 }
 
+PajeVariableEvent::PajeVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value)
+  : PajeEvent (event, container, type)
+{
+  _doubleValue = value;
+}
+
 std::string PajeVariableEvent::kind (void)
 {
   return std::string ("Variable");
@@ -119,6 +150,13 @@ double PajeVariableEvent::doubleValue (void)
 }
 
 PajeLinkEvent::PajeLinkEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key)
+  : PajeCategorizedEvent (event, container, type, value)
+{
+  _linkedContainer = linkedContainer;
+  _key = key;
+}
+
+PajeLinkEvent::PajeLinkEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key)
   : PajeCategorizedEvent (event, container, type, value)
 {
   _linkedContainer = linkedContainer;
@@ -161,8 +199,17 @@ PajeSetVariableEvent::PajeSetVariableEvent (PajeTraceEvent *event, PajeContainer
   : PajeVariableEvent (event, container, type, value)
 {
 }
+PajeSetVariableEvent::PajeSetVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value)
+  : PajeVariableEvent (event, container, type, value)
+{
+}
 
 PajeAddVariableEvent::PajeAddVariableEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, double value)
+  : PajeVariableEvent (event, container, type, value)
+{
+}
+
+PajeAddVariableEvent::PajeAddVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value)
   : PajeVariableEvent (event, container, type, value)
 {
 }
@@ -172,7 +219,17 @@ PajeSubVariableEvent::PajeSubVariableEvent (PajeTraceEvent *event, PajeContainer
 {
 }
 
+PajeSubVariableEvent::PajeSubVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value)
+  : PajeVariableEvent (event, container, type, value)
+{
+}
+
 PajeStartLinkEvent::PajeStartLinkEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key)
+  : PajeLinkEvent (event, container, type, value, linkedContainer, key)
+{
+}
+
+PajeStartLinkEvent::PajeStartLinkEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key)
   : PajeLinkEvent (event, container, type, value, linkedContainer, key)
 {
 }
@@ -187,12 +244,22 @@ PajeEndLinkEvent::PajeEndLinkEvent (PajeTraceEvent *event, PajeContainer *contai
 {
 }
 
+PajeEndLinkEvent::PajeEndLinkEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key)
+  : PajeLinkEvent (event, container, type, value, linkedContainer, key)
+{
+}
+
 PajeContainer *PajeEndLinkEvent::endContainer (void)
 {
   return _linkedContainer;
 }
 
 PajeDestroyContainerEvent::PajeDestroyContainerEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type)
+  : PajeEvent (event, container, type)
+{
+}
+
+PajeDestroyContainerEvent::PajeDestroyContainerEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type)
   : PajeEvent (event, container, type)
 {
 }

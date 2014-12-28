@@ -92,7 +92,6 @@ static double gettime (void)
 
 int main (int argc, char **argv)
 {
-  printf("here");
   struct arguments arguments;
   bzero (&arguments, sizeof(struct arguments));
   if (argp_parse (&argp, argc, argv, 0, 0, &arguments) == ARGP_KEY_ERROR){
