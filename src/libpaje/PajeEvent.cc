@@ -122,7 +122,17 @@ PajeStateEvent::PajeStateEvent (PajeTraceEvent *event, PajeContainer *container,
 {
 }
 
+PajeStateEvent::PajeStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
+  : PajeCategorizedEvent (event, container, type, value)
+{
+}
+
 PajeEventEvent::PajeEventEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
+  : PajeCategorizedEvent (event, container, type, value)
+{
+}
+
+PajeEventEvent::PajeEventEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
   : PajeCategorizedEvent (event, container, type, value)
 {
 }
@@ -175,7 +185,17 @@ PajeNewEventEvent::PajeNewEventEvent (PajeTraceEvent *event, PajeContainer *cont
 {
 }
 
+PajeNewEventEvent::PajeNewEventEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
+  : PajeEventEvent (event, container, type, value)
+{
+}
+
 PajeSetStateEvent::PajeSetStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
+  : PajeStateEvent (event, container, type, value)
+{
+}
+
+PajeSetStateEvent::PajeSetStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
   : PajeStateEvent (event, container, type, value)
 {
 }
@@ -185,12 +205,27 @@ PajePushStateEvent::PajePushStateEvent (PajeTraceEvent *event, PajeContainer *co
 {
 }
 
+PajePushStateEvent::PajePushStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
+  : PajeStateEvent (event, container, type, value)
+{
+}
+
 PajePopStateEvent::PajePopStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type)
   : PajeStateEvent (event, container, type, NULL)
 {
 }
 
+PajePopStateEvent::PajePopStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type)
+  : PajeStateEvent (event, container, type, NULL)
+{
+}
+
 PajeResetStateEvent::PajeResetStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type)
+  : PajeStateEvent (event, container, type, NULL)
+{
+}
+
+PajeResetStateEvent::PajeResetStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type)
   : PajeStateEvent (event, container, type, NULL)
 {
 }

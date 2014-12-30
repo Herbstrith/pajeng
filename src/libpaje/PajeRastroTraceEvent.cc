@@ -77,9 +77,7 @@ PajeRastroTraceEvent::~PajeRastroTraceEvent ()
   str_fields.clear();
   double_fields.clear();
   int_fields.clear();
-  free(v_uint32);
-  free(v_string);
-  free(v_double);
+
 }
 
 PajeEventId PajeRastroTraceEvent::pajeEventId (void)

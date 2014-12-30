@@ -67,12 +67,16 @@ class PajeStateEvent : public PajeCategorizedEvent
 {
 public:
   PajeStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
+  PajeStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
+
 };
 
 class PajeEventEvent : public PajeCategorizedEvent
 {
 public:
   PajeEventEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
+  PajeEventEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
+
 };
 
 class PajeVariableEvent : public PajeEvent
@@ -105,30 +109,37 @@ class PajeNewEventEvent : public PajeEventEvent
 {
 public:
   PajeNewEventEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
+  PajeNewEventEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
 };
 
 class PajeSetStateEvent : public PajeStateEvent
 {
 public:
   PajeSetStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
+  PajeSetStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
 };
 
 class PajePushStateEvent : public PajeStateEvent
 {
 public:
   PajePushStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
+  PajePushStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
 };
 
 class PajePopStateEvent : public PajeStateEvent
 {
 public:
   PajePopStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type);
+  PajePopStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type);
+
 };
 
 class PajeResetStateEvent : public PajeStateEvent
 {
 public:
   PajeResetStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type);
+  PajeResetStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type);
+
 };
 
 class PajeSetVariableEvent : public PajeVariableEvent

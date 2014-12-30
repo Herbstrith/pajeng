@@ -511,7 +511,7 @@ void PajeSimulator::pajeCreateContainer (PajeTraceEvent *traceEvent)
     name = traceEvent->valueForField (PAJE_Name);
     alias = traceEvent->valueForField (PAJE_Alias);
   }else{
-    time = RastrotraceEvent->valueForStringField (PAJE_Time); 
+    time = RastrotraceEvent->valueForDoubleField (PAJE_Time); 
     typestr = RastrotraceEvent->valueForStringField (PAJE_Type);    
     containerid = RastrotraceEvent->valueForStringField (PAJE_Container);  
     name = RastrotraceEvent->valueForStringField (PAJE_Name);   
@@ -648,13 +648,15 @@ void PajeSimulator::pajeNewEvent (PajeTraceEvent *traceEvent)
   std::string typestr;
   std::string containerstr;
   std::string value;
+  
+  PajeRastroTraceEvent  *RastrotraceEvent;
   if(!useRastroEvent){
     time = traceEvent->valueForField (PAJE_Time);
     typestr = traceEvent->valueForField (PAJE_Type);
     containerstr = traceEvent->valueForField (PAJE_Container);
     value = traceEvent->valueForField (PAJE_Value);
   }else{
-    PajeRastroTraceEvent  *RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
+    RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
     time = RastrotraceEvent->valueForStringField (PAJE_Time);
     typestr = RastrotraceEvent->valueForStringField (PAJE_Type);
     containerstr = RastrotraceEvent->valueForStringField (PAJE_Container);
@@ -705,9 +707,15 @@ void PajeSimulator::pajeNewEvent (PajeTraceEvent *traceEvent)
   }else{
     val = type->addValue (value, value, NULL);
   }
-
-  PajeNewEventEvent event (traceEvent, container, type, val);
-  container->demuxer (&event);
+  
+  if(!useRastroEvent){
+    PajeNewEventEvent event (traceEvent, container, type, val);
+    container->demuxer(&event);
+  }else{
+    PajeNewEventEvent event(RastrotraceEvent, container, type, val);
+    container->rastroDemuxer (&event);
+  }
+  
 }
 
 void PajeSimulator::pajeSetState (PajeTraceEvent *traceEvent)
@@ -718,13 +726,14 @@ void PajeSimulator::pajeSetState (PajeTraceEvent *traceEvent)
   std::string containerstr;
   std::string value;
 	
+  PajeRastroTraceEvent  *RastrotraceEvent ;
   if(!useRastroEvent){
     time = traceEvent->valueForField (PAJE_Time);
     typestr = traceEvent->valueForField (PAJE_Type);
     containerstr = traceEvent->valueForField (PAJE_Container);
     value = traceEvent->valueForField (PAJE_Value);
   }else{
-    PajeRastroTraceEvent  *RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
+    RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
     time = RastrotraceEvent->valueForStringField (PAJE_Time);
     typestr = RastrotraceEvent->valueForStringField (PAJE_Type);
     containerstr = RastrotraceEvent->valueForStringField (PAJE_Container);
@@ -774,9 +783,15 @@ void PajeSimulator::pajeSetState (PajeTraceEvent *traceEvent)
   }else{
     val = type->addValue (value, value, NULL);
   }
-
-  PajeSetStateEvent event (traceEvent, container, type, val);
-  container->demuxer (&event);
+  
+  if(!useRastroEvent){
+    PajeSetStateEvent event (traceEvent, container, type, val);
+    container->demuxer(&event);
+  }else{
+    PajeSetStateEvent event(RastrotraceEvent, container, type, val);
+    container->rastroDemuxer (&event);
+  }
+  
 }
 
 void PajeSimulator::pajePushState (PajeTraceEvent *traceEvent)
@@ -786,13 +801,14 @@ void PajeSimulator::pajePushState (PajeTraceEvent *traceEvent)
   std::string containerstr;
   std::string value;
   
+  PajeRastroTraceEvent  *RastrotraceEvent;
   if(!useRastroEvent){
     time = traceEvent->valueForField (PAJE_Time);
     typestr = traceEvent->valueForField (PAJE_Type);
     containerstr = traceEvent->valueForField (PAJE_Container);
     value = traceEvent->valueForField (PAJE_Value);
   }else{
-    PajeRastroTraceEvent  *RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
+    RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
     time = RastrotraceEvent->valueForStringField (PAJE_Time);
     typestr = RastrotraceEvent->valueForStringField (PAJE_Type);
     containerstr = RastrotraceEvent->valueForStringField (PAJE_Container);
@@ -843,8 +859,14 @@ void PajeSimulator::pajePushState (PajeTraceEvent *traceEvent)
     val = type->addValue (value, value, NULL);
   }
 
-  PajePushStateEvent event (traceEvent, container, type, val);
-  container->demuxer (&event);
+  if(!useRastroEvent){
+    PajePushStateEvent event (traceEvent, container, type, val);
+    container->demuxer (&event);
+  }else{
+    PajePushStateEvent event(RastrotraceEvent, container, type, val);
+    container->rastroDemuxer (&event);
+  }
+  
 }
 
 void PajeSimulator::pajePopState (PajeTraceEvent *traceEvent)
@@ -854,12 +876,13 @@ void PajeSimulator::pajePopState (PajeTraceEvent *traceEvent)
   std::string typestr;
   std::string containerstr;
   
+  PajeRastroTraceEvent  *RastrotraceEvent;
   if(!useRastroEvent){
     time = traceEvent->valueForField (PAJE_Time);
     typestr = traceEvent->valueForField (PAJE_Type);
     containerstr = traceEvent->valueForField (PAJE_Container);
   }else{
-    PajeRastroTraceEvent  *RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
+    RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
     time = RastrotraceEvent->valueForStringField (PAJE_Time);
     typestr = RastrotraceEvent->valueForStringField (PAJE_Type);
     containerstr = RastrotraceEvent->valueForStringField (PAJE_Container);
@@ -900,9 +923,15 @@ void PajeSimulator::pajePopState (PajeTraceEvent *traceEvent)
     ctype2 << *container->type();
     throw PajeTypeException ("Type '"+ctype1.str()+"' is not child type of container type '"+ctype2.str()+"' in "+eventdesc.str());
   }
-
-  PajePopStateEvent event (traceEvent, container, type);
-  container->demuxer (&event);
+  
+  if(!useRastroEvent){
+    PajePopStateEvent event (traceEvent, container, type);
+    container->demuxer (&event);
+  }else{
+    PajePopStateEvent event(RastrotraceEvent, container, type);
+    container->rastroDemuxer (&event);
+  }
+  
 }
 
 
@@ -912,12 +941,13 @@ void PajeSimulator::pajeResetState (PajeTraceEvent *traceEvent)
   std::string typestr;
   std::string containerstr;
 	
+  PajeRastroTraceEvent  *RastrotraceEvent;
   if(!useRastroEvent){
     time = traceEvent->valueForField (PAJE_Time);
     typestr = traceEvent->valueForField (PAJE_Type);
     containerstr = traceEvent->valueForField (PAJE_Container);
   }else{
-    PajeRastroTraceEvent  *RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
+    RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(traceEvent);	
     time = RastrotraceEvent->valueForStringField (PAJE_Time);
     typestr = RastrotraceEvent->valueForStringField (PAJE_Type);
     containerstr = RastrotraceEvent->valueForStringField (PAJE_Container);
@@ -959,8 +989,14 @@ void PajeSimulator::pajeResetState (PajeTraceEvent *traceEvent)
     throw PajeTypeException ("Type '"+ctype1.str()+"' is not child type of container type '"+ctype2.str()+"' in "+eventdesc.str());
   }
 
-  PajeResetStateEvent event (traceEvent, container, type);
-  container->demuxer (&event);
+  if(!useRastroEvent){
+    PajeResetStateEvent event (traceEvent, container, type);
+    container->demuxer (&event);
+  }else{
+    PajeResetStateEvent event(RastrotraceEvent, container, type);
+    container->rastroDemuxer (&event);
+  }
+
 }
 
 void PajeSimulator::pajeSetVariable (PajeTraceEvent *traceEvent)

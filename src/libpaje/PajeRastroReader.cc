@@ -114,10 +114,13 @@ void PajeRastroReader::readNextChunk ()
         //printf("call simulator \n");
 
         PajeComponent::outputEntity(event);
-      //  delete event; //mem_free error here
+        currentEvent++;
+
+         //mem_free error here
         currentEvent++;
        
       }
+      delete event;
        //printf("finished read event %d \n",currentEvent);
     }
   }else{
