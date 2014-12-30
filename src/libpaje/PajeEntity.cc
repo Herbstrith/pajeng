@@ -270,6 +270,12 @@ PajeValueEntity::PajeValueEntity (PajeContainer *container, PajeType *type, doub
   _value = value;
 }
 
+PajeValueEntity::PajeValueEntity (PajeContainer *container, PajeType *type, double time, PajeValue *value, PajeRastroTraceEvent *event)
+  : PajeDoubleTimedEntity (container, type, time, event)
+{
+  _value = value;
+}
+
 PajeValue *PajeValueEntity::value (void) const
 {
   return _value;
@@ -330,6 +336,18 @@ PajeUserState::PajeUserState (PajeContainer *container, PajeType *type, double s
 }
 
 PajeUserState::PajeUserState (PajeContainer *container, PajeType *type, double startTime, PajeValue *value, int imbric, PajeTraceEvent *event)
+  : PajeValueEntity (container, type, startTime, value, event)
+{
+  this->imbrication = imbric;
+}
+
+PajeUserState::PajeUserState (PajeContainer *container, PajeType *type, double startTime, PajeValue *value, PajeRastroTraceEvent *event)
+  : PajeValueEntity (container, type, startTime, value, event)
+{
+  this->imbrication = 0;
+}
+
+PajeUserState::PajeUserState (PajeContainer *container, PajeType *type, double startTime, PajeValue *value, int imbric, PajeRastroTraceEvent *event)
   : PajeValueEntity (container, type, startTime, value, event)
 {
   this->imbrication = imbric;

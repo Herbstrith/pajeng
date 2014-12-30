@@ -312,15 +312,19 @@ void PajeContainer::pajePushState (PajeEvent *event)
   PajeType *type = event->type();
   PajeValue *value = event->value();
   PajeTraceEvent *traceEvent = event->traceEvent();
-
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
   checkTimeOrder (event);
 
   std::vector<PajeUserState*> *stack = &stackStates[type];
 
   //define new imbrication level
   int imbrication = !stack->size() ? 0 : (stack->back())->imbricationLevel() + 1;
-
-  PajeUserState *state = new PajeUserState (this, type, time, value, imbrication, traceEvent);
+   PajeUserState *state;
+  if(rastroTraceEvent == NULL){
+     state = new PajeUserState (this, type, time, value, imbrication, traceEvent);
+  }else{
+     state = new PajeUserState (this, type, time, value, imbrication, rastroTraceEvent);
+  }
   entities[type].push_back (state);
   stack->push_back (state);
 }

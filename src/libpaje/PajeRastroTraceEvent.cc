@@ -25,7 +25,7 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
 {
   pajeEventDefinition = def;
 
-  std::list<PajeField>::iterator itFields = def->fields.begin();
+  /*std::list<PajeField>::iterator itFields = def->fields.begin();
   std::list<PajeFieldType>::iterator itTypes = def->types.begin();
   int i=0;
   //first field is the event type
@@ -33,13 +33,7 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
   itTypes++;
   int int_mark =0,double_mark =0,string_mark =0;
   
-   //   printf("\n list size %d %d %d\n ", def->fields.size(),*itFields,*itTypes);
-
-
-  
   while (itFields != def->fields.end()){ 
-  
-    
     if(*itTypes == PAJE_string || *itTypes == PAJE_color){
       definitionOrder[i] = PAJE_string;    
       paje_field[*itFields] = string_mark;
@@ -63,12 +57,22 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
       itTypes++;
       i++;
   }
+*/
+
+ // memcpy(paje_field, def->paje_field, sizeof(def->paje_field));
+ paje_field = def->paje_field;
+  memcpy(definitionOrder, def->definitionOrder, sizeof(def->definitionOrder));
 
   pajeEventDefinition = def;
-
-  memcpy(v_uint32 , event->v_uint32,sizeof(event->v_uint32));
-  memcpy(v_string , event->v_string,sizeof(event->v_string)); 
-  memcpy(v_double , event->v_double,sizeof(event->v_double));  
+  if(def->int_mark > 0){
+    memcpy(v_uint32 , event->v_uint32,sizeof(event->v_uint32));
+  }
+  if(def->string_mark > 0){
+    memcpy(v_string , event->v_string,sizeof(event->v_string)); 
+  }
+  if(def->double_mark > 0){
+    memcpy(v_double , event->v_double,sizeof(event->v_double));  
+  }
   
 }
 

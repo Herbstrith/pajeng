@@ -166,7 +166,6 @@ PajeSimulator::~PajeSimulator ()
 
 void PajeSimulator::inputEntity (PajeObject *data)
 {  
-
   if(!useRastroEvent){
     //get event, set last known time
 	  PajeTraceEvent *event = (PajeTraceEvent*)data;

@@ -20,6 +20,7 @@
 
 PajeEventDefinition::PajeEventDefinition (PajeEventId id, int unique, int line, PajeDefinitions *definitions)
 {
+  int_mark =0;double_mark =0;string_mark =0;definition_mark =0;
   defs = definitions;
   pajeEventIdentifier = id;
   uniqueIdentifier = unique;
@@ -49,10 +50,33 @@ void PajeEventDefinition::addField (PajeField field, PajeFieldType type, int lin
 
   fields.push_back (field);
   types.push_back (type);
+  
+  
+ 
+  if(type == PAJE_string || type == PAJE_color){
+    definitionOrder[definition_mark] = PAJE_string;    
+    paje_field[field] = string_mark;
+    string_mark++;
+  }
+
+  if(type == PAJE_double || type == PAJE_date){
+    definitionOrder[definition_mark] = PAJE_double;
+    paje_field[field] = double_mark;		
+    double_mark++;
+  }
+
+  if(type == PAJE_int){
+    definitionOrder[definition_mark] = PAJE_int;
+    paje_field[field] = int_mark;		
+    int_mark++;
+  }  
+  definition_mark++;
+  
+  
 }
 
 void PajeEventDefinition::addField (PajeField field, PajeFieldType type, int line, std::string userDefinedFieldName)
-{
+{  
   if (field == PAJE_Extra){
     userDefinedFieldNames.push_back (userDefinedFieldName);
   }

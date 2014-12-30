@@ -22,7 +22,7 @@ PajeEvent::PajeEvent (PajeTraceEvent *event, PajeContainer *container, PajeType 
   _event = event;
   _container = container;
   _type = type;
-
+  _rastroEvent = NULL;
   //extracing time
   std::string t = _event->valueForField (PAJE_Time);
   if (t.length() == 0){

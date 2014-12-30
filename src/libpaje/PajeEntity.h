@@ -147,6 +147,7 @@ private:
 
 public:
   PajeValueEntity (PajeContainer *container, PajeType *type, double time, PajeValue *value, PajeTraceEvent *event);
+  PajeValueEntity (PajeContainer *container, PajeType *type, double time, PajeValue *value, PajeRastroTraceEvent *event);
   PajeValue *value (void) const;
 };
 
@@ -190,6 +191,8 @@ private:
 public:
   PajeUserState (PajeContainer *container, PajeType *type, double time, PajeValue *value, PajeTraceEvent *event);
   PajeUserState (PajeContainer *container, PajeType *type, double time, PajeValue *value, int imbrication, PajeTraceEvent *event);
+  PajeUserState (PajeContainer *container, PajeType *type, double time, PajeValue *value, PajeRastroTraceEvent *event);
+  PajeUserState (PajeContainer *container, PajeType *type, double time, PajeValue *value, int imbrication, PajeRastroTraceEvent *event);
   std::string description (void) const;
   int imbricationLevel (void) const;
 };

@@ -44,7 +44,12 @@ class PajeEventDefinition {
   std::list<PajeField> fields;
   std::list<PajeFieldType> types;
   std::vector<std::string> userDefinedFieldNames;
+  //used in rastroTraceEvent
+  int definitionOrder[10];
+  std::map <PajeField, int> paje_field;
+  int int_mark ,double_mark ,string_mark ,definition_mark;
 
+  
 public:
   PajeEventDefinition (PajeEventId id, int unique, int line, PajeDefinitions *definitions);
   ~PajeEventDefinition (void);
