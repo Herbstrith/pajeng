@@ -61,7 +61,7 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
   
   int fieldOrder[10];
   int definitionOrder[10];
-  std::map <PajeField, int> paje_field;
+  std::map <PajeField, int> *paje_field;
  public:
   PajeRastroTraceEvent ();
   PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event);

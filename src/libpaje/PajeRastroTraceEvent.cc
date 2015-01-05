@@ -24,43 +24,9 @@ PajeRastroTraceEvent::PajeRastroTraceEvent ()
 PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event)
 {
   pajeEventDefinition = def;
-
-  /*std::list<PajeField>::iterator itFields = def->fields.begin();
-  std::list<PajeFieldType>::iterator itTypes = def->types.begin();
-  int i=0;
-  //first field is the event type
-  itFields++;
-  itTypes++;
-  int int_mark =0,double_mark =0,string_mark =0;
   
-  while (itFields != def->fields.end()){ 
-    if(*itTypes == PAJE_string || *itTypes == PAJE_color){
-      definitionOrder[i] = PAJE_string;    
-      paje_field[*itFields] = string_mark;
-      string_mark++;
-    }
-    
-    if(*itTypes == PAJE_double || *itTypes == PAJE_date){
-      definitionOrder[i] = PAJE_double;
-      paje_field[*itFields] = double_mark;		
-      double_mark++;
-
-    }
-    
-    if(*itTypes == PAJE_int){
-      definitionOrder[i] = PAJE_int;
-      paje_field[*itFields] = int_mark;		
-      int_mark++;
-
-    }  
-      itFields++;
-      itTypes++;
-      i++;
-  }
-*/
-
- // memcpy(paje_field, def->paje_field, sizeof(def->paje_field));
- paje_field = def->paje_field;
+  paje_field = &def->paje_field;
+ 
   memcpy(definitionOrder, def->definitionOrder, sizeof(def->definitionOrder));
 
   pajeEventDefinition = def;
@@ -158,20 +124,20 @@ T PajeRastroTraceEvent::valueForField (PajeField field)
 char* PajeRastroTraceEvent::valueForStringField(PajeField field)
 {
   char* value = "-1";  
-  value = v_string[paje_field[field]];
+  value = v_string[(*paje_field)[field]];
   return value;
 }
 
 int PajeRastroTraceEvent::valueForIntField(PajeField field)
 {
   int value;
-  value = v_uint32[paje_field[field]];
+  value = v_uint32[(*paje_field)[field]];
   return value;
 }
 double PajeRastroTraceEvent::valueForDoubleField(PajeField field)
 {
   double value;
-  value = v_double[paje_field[field]];
+  value = v_double[(*paje_field)[field]];
   return value;
 }
 
