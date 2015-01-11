@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU Public License
 # along with PajeNG. If not, see <http://www.gnu.org/licenses/>.
 CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
+# The following line should be deleted in some Ubuntu releases
+#cmake_policy(SET CMP0050 OLD)
 PROJECT(pajeng)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")

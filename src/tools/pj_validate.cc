@@ -37,7 +37,6 @@ static struct argp_option options[] = {
   {"time", 't', 0, OPTION_ARG_OPTIONAL, "Print number of seconds to simulate input"},
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
   {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
-  {"rastroreader", 'z', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input using the proper rastro reader"},
   { 0 }
 };
 
@@ -48,7 +47,6 @@ struct arguments {
   int quiet;
   int time;
   int flex;
-  int rastro;
   int rastroReader;
 };
 
@@ -60,8 +58,7 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 't': arguments->time = 1; break;
   case 'q': arguments->quiet = 1; break;
   case 'f': arguments->flex = 1; break;
-  case 'r': arguments->rastro = 1;break;
-  case 'z': arguments->rastroReader = 1;break;
+  case 'r': arguments->rastroReader = 1;break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {
       /* Too many arguments. */
@@ -117,10 +114,6 @@ int main (int argc, char **argv)
         reader = new PajeFlexReader(filename, definitions);
       }
     }else{
-      if(arguments.rastro)
-      {
-        reader = new PajeBinaryReader(definitions,arguments.input[0]);
-      }
       if(arguments.rastroReader)
       {
         reader = new PajeRastroReader(definitions,arguments.input[0]);
@@ -142,11 +135,6 @@ int main (int argc, char **argv)
     }
     
     simulator = new PajeSimulator ();
-    if(arguments.rastro)
-    {
-      reader->setOutputComponent (simulator);
-      simulator->setInputComponent (reader);
-    }
     if(arguments.rastroReader)
 		{
       simulator = new PajeSimulator (true);

@@ -28,6 +28,8 @@ continued at [INF/UFRGS](http://www.inf.ufrgs.br/en/).
 
 What i am working at:
 ==================================
-Make PajeNG work with the new binary trace format, which aims to increase the performance of the tool.
+Make PajeNG work with the new binary trace format(librastro+poti), which aims to increase the performance of the tool.
+To use the new format as input, one must use 'r' and the .rst file as parameters.Ex "./pj_validate -r rastro_file.rst"
+--working with pj_validate.
 
 
