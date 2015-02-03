@@ -16,10 +16,6 @@ __pj_dump__ and __pj_validate__). It was started as part of the french
 project](http://infra-songs.gforge.inria.fr/). Development has
 continued at [INF/UFRGS](http://www.inf.ufrgs.br/en/).
 
-### Two-line Installation
-
-     sudo apt-get install git cmake build-essential libqt4-dev libboost-dev freeglut3-dev asciidoc flex bison;
-     git clone git://github.com/schnorr/pajeng.git ; mkdir -p pajeng/b ; cd pajeng/b ; cmake .. ; make install
 
 ### Detailed Installation and everything else
 
@@ -31,5 +27,6 @@ What i am working at:
 Make PajeNG work with the new binary trace format(librastro+poti), which aims to increase the performance of the tool.
 To use the new format as input, one must use 'r' and the .rst file as parameters.Ex "./pj_validate -r rastro_file.rst"
 --working with pj_validate.
+--better performance if using the slightly modified librastro from my repository.
 
 
