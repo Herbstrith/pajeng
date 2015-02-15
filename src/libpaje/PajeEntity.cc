@@ -310,6 +310,12 @@ PajeUserEvent::PajeUserEvent (PajeContainer *container, PajeType *type, double t
   this->_value = value;
 }
 
+PajeUserEvent::PajeUserEvent (PajeContainer *container, PajeType *type, double time, PajeValue *value, PajeRastroTraceEvent *event)
+  : PajeSingleTimedEntity (container, type, time, event)
+{
+  this->_value = value;
+}
+
 std::string PajeUserEvent::description (void) const
 {
   std::stringstream description;
@@ -381,6 +387,12 @@ PajeUserVariable::PajeUserVariable (PajeContainer *container, PajeType *type, do
   _value = value;
 }
 
+PajeUserVariable::PajeUserVariable (PajeContainer *container, PajeType *type, double time, double value, PajeRastroTraceEvent *event)
+  : PajeDoubleTimedEntity (container, type, time, event)
+{
+  _value = value;
+}
+
 std::string PajeUserVariable::description (void) const
 {
 
@@ -419,6 +431,14 @@ void PajeUserVariable::subtractDoubleValue (double value)
  * PajeUserLink
  */
 PajeUserLink::PajeUserLink (PajeContainer *container, PajeType *type, double time, PajeValue *value, std::string key, PajeContainer *startContainer, PajeTraceEvent *event)
+  : PajeValueEntity (container, type, time, value, event)
+{
+  this->key = key;
+  this->startCont = startContainer;
+  this->endCont = NULL;
+}
+
+PajeUserLink::PajeUserLink (PajeContainer *container, PajeType *type, double time, PajeValue *value, std::string key, PajeContainer *startContainer, PajeRastroTraceEvent *event)
   : PajeValueEntity (container, type, time, value, event)
 {
   this->key = key;

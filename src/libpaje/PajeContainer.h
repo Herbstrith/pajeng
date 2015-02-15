@@ -110,6 +110,8 @@ private:
                           PajeAggregatedDict b);
   bool checkTimeOrder (PajeEvent *event);
   bool checkTimeOrder (double time, PajeType *type, PajeTraceEvent *traceEvent);
+  bool checkTimeOrder (double time, PajeType *type, PajeRastroTraceEvent *traceEvent);
+
   bool checkPendingLinks (void);
 
 

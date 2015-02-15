@@ -283,9 +283,16 @@ void PajeContainer::pajeNewEvent (PajeEvent *event)
   PajeType *type = event->type();
   PajeValue *value = event->value();
   PajeTraceEvent *traceEvent = event->traceEvent();
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
 
   checkTimeOrder (event);
-  PajeUserEvent *n = new PajeUserEvent(this, type, time, value, traceEvent);
+  
+  PajeUserEvent *n;
+  if(rastroTraceEvent == NULL){
+    n = new PajeUserEvent(this, type, time, value, traceEvent);
+  }else{
+    n = new PajeUserEvent(this, type, time, value, rastroTraceEvent);
+  }
   entities[type].push_back (n);
 }
 
@@ -295,11 +302,17 @@ void PajeContainer::pajeSetState (PajeEvent *event)
   PajeType *type = event->type();
   PajeValue *value = event->value();
   PajeTraceEvent *traceEvent = event->traceEvent();
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
 
   checkTimeOrder (event);
   pajeResetState (event);
 
-  PajeUserState *state = new PajeUserState (this, type, time, value, traceEvent);
+  PajeUserState *state;
+  if(rastroTraceEvent == NULL){
+    state = new PajeUserState (this, type, time, value, traceEvent);
+  }else{
+    state = new PajeUserState(this, type, time, value, rastroTraceEvent);
+  }
   entities[type].push_back (state);
 
   std::vector<PajeUserState*> *stack = &stackStates[type];
@@ -334,6 +347,7 @@ void PajeContainer::pajePopState (PajeEvent *event)
   double time = event->time();
   PajeType *type = event->type();
   PajeTraceEvent *traceEvent = event->traceEvent();
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
 
   checkTimeOrder (event);
 
@@ -341,7 +355,11 @@ void PajeContainer::pajePopState (PajeEvent *event)
   std::vector<PajeUserState*> *stack = &stackStates[type];
   if (!stack->size()){
     std::stringstream line;
-    line << *traceEvent;
+    if(rastroTraceEvent == NULL){
+      line << *traceEvent;
+    }else{
+      line << *rastroTraceEvent;
+    }
     throw PajeStateException ("Illegal pop event of a state that has no value in "+line.str());
   }
 
@@ -358,7 +376,8 @@ void PajeContainer::pajeResetState (PajeEvent *event)
   double time = event->time();
   PajeType *type = event->type();
   PajeTraceEvent *traceEvent = event->traceEvent();
-
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
+  
   checkTimeOrder (event);
 
   //clean the stack, using time as endTime
@@ -377,6 +396,7 @@ void PajeContainer::pajeSetVariable (PajeEvent *event)
   PajeType *type = event->type();
   double value = event->doubleValue();
   PajeTraceEvent *traceEvent = event->traceEvent();
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
 
 
   PajeEntity *last = NULL;
@@ -395,7 +415,12 @@ void PajeContainer::pajeSetVariable (PajeEvent *event)
   }
 
   //create new
-  PajeUserVariable *val = new PajeUserVariable (this, type, time, value, traceEvent);
+  PajeUserVariable *val;
+  if(rastroTraceEvent == NULL){
+    val = new PajeUserVariable (this, type, time, value, traceEvent);
+  }else{
+    val = new PajeUserVariable (this, type, time, value, rastroTraceEvent);
+  }
   entities[type].push_back(val);
 }
 
@@ -405,10 +430,15 @@ void PajeContainer::pajeAddVariable (PajeEvent *event)
   PajeType *type = event->type();
   double value = event->doubleValue();
   PajeTraceEvent *traceEvent = event->traceEvent();
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
 
   if (entities[type].size() == 0){
     std::stringstream line;
-    line << *traceEvent;
+    if(rastroTraceEvent == NULL){
+      line << *traceEvent;
+    }else{
+      line << *rastroTraceEvent;
+    }
     throw PajeVariableException ("Illegal addition to a variable that has no value (yet) in "+line.str());
   }
 
@@ -429,7 +459,13 @@ void PajeContainer::pajeAddVariable (PajeEvent *event)
     }
   }
   //create new
-  PajeUserVariable *val = new PajeUserVariable (this, type, time, lastValue + value, traceEvent);
+  PajeUserVariable *val;
+  if(rastroTraceEvent == NULL){
+    val = new PajeUserVariable (this, type, time, lastValue + value, traceEvent);
+  }else{
+    val = new PajeUserVariable (this, type, time, lastValue + value, rastroTraceEvent);
+  }
+    
   entities[type].push_back(val);
 }
 
@@ -439,6 +475,7 @@ void PajeContainer::pajeSubVariable (PajeEvent *event)
   PajeType *type = event->type();
   double value = event->doubleValue();
   PajeTraceEvent *traceEvent = event->traceEvent();
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
 
   if (entities[type].size() == 0){
     std::stringstream line;
@@ -464,7 +501,12 @@ void PajeContainer::pajeSubVariable (PajeEvent *event)
   }
 
   //create new
-  PajeUserVariable *val = new PajeUserVariable (this, type, time, lastValue - value, traceEvent);
+  PajeUserVariable *val;
+  if(rastroTraceEvent == NULL){
+    val = new PajeUserVariable (this, type, time, lastValue - value, traceEvent);
+  }else{
+    val = new PajeUserVariable (this, type, time, lastValue - value, rastroTraceEvent);
+  }
   entities[type].push_back(val);
 }
 
@@ -475,6 +517,7 @@ void PajeContainer::pajeStartLink (PajeEvent *event)
   std::string key = event->key();
   PajeValue *value = event->value();
   PajeTraceEvent *traceEvent = event->traceEvent();
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
   PajeContainer *startContainer = event->startContainer();
 
   if (linksUsedKeys[type].count(key)){
@@ -484,7 +527,12 @@ void PajeContainer::pajeStartLink (PajeEvent *event)
   }
 
   if (pendingLinks[type].count(key) == 0){
-    PajeUserLink *link = new PajeUserLink(this, type, time, value, key, startContainer, traceEvent);
+    PajeUserLink *link;
+    if(rastroTraceEvent == NULL){
+      link = new PajeUserLink(this, type, time, value, key, startContainer, traceEvent);
+    }else{
+      link = new PajeUserLink(this, type, time, value, key, startContainer, rastroTraceEvent);
+    }
     pendingLinks[type].insert (std::make_pair(key, link));
 
   }else{
@@ -492,7 +540,11 @@ void PajeContainer::pajeStartLink (PajeEvent *event)
     PajeUserLink *link = (pendingLinks[type].find(key))->second;
     link->setStartTime (time);
     link->setStartContainer (startContainer);
-    link->addPajeTraceEvent (traceEvent);
+    if(rastroTraceEvent == NULL){
+      link->addPajeTraceEvent (traceEvent);
+    }else{
+      link->addPajeTraceEvent (rastroTraceEvent);
+    }
 
     //check validity of the PajeEndLink when compared to its PajeStartLink
     if (link->value() != value){
@@ -502,8 +554,11 @@ void PajeContainer::pajeStartLink (PajeEvent *event)
     }
 
     //checking time-ordered for this type
-    checkTimeOrder (link->startTime(), type, traceEvent);
-
+    if(rastroTraceEvent == NULL){
+      checkTimeOrder (link->startTime(), type, traceEvent);
+    }else{
+      checkTimeOrder (link->startTime(), type, rastroTraceEvent);
+    }
     //push the newly completed link on the back of the vector
     entities[type].push_back(link);
 
@@ -520,6 +575,7 @@ void PajeContainer::pajeEndLink (PajeEvent *event)
   std::string key = event->key();
   PajeValue *value = event->value();
   PajeTraceEvent *traceEvent = event->traceEvent();
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
   PajeContainer *endContainer = event->endContainer();
 
   if (linksUsedKeys[type].count(key)){
@@ -530,7 +586,12 @@ void PajeContainer::pajeEndLink (PajeEvent *event)
 
   if (pendingLinks[type].count(key) == 0){
     //there is no corresponding PajeStartLink
-    PajeUserLink *link = new PajeUserLink(this, type, -1, value, key, NULL, traceEvent);
+    PajeUserLink *link;
+    if(rastroTraceEvent == NULL){
+      link = new PajeUserLink(this, type, -1, value, key, NULL, traceEvent);
+    }else{
+      link = new PajeUserLink(this, type, -1, value, key, NULL, rastroTraceEvent);
+    }
     link->setEndContainer (endContainer);
     link->setEndTime (time);
     pendingLinks[type].insert (std::make_pair(key, link));
@@ -540,8 +601,11 @@ void PajeContainer::pajeEndLink (PajeEvent *event)
     PajeUserLink *link = (pendingLinks[type].find(key))->second;
     link->setEndContainer (endContainer);
     link->setEndTime (time);
-    link->addPajeTraceEvent (traceEvent);
-
+    if(rastroTraceEvent == NULL){
+      link->addPajeTraceEvent (traceEvent);
+    }else{
+      link->addPajeTraceEvent (rastroTraceEvent);
+    }
     //check validity of the PajeEndLink when compared to its PajeStartLink
     if (link->value() != value){
       std::stringstream eventdesc;
@@ -550,8 +614,11 @@ void PajeContainer::pajeEndLink (PajeEvent *event)
     }
 
     //checking time-ordered for this type
-    checkTimeOrder (link->endTime(), type, traceEvent);
-
+    if(rastroTraceEvent == NULL){
+      checkTimeOrder (link->endTime(), type, traceEvent);
+    }else{
+      checkTimeOrder (link->endTime(), type, rastroTraceEvent);
+    }
     //push the newly completed link on the back of the vector
     entities[type].push_back(link);
 
@@ -729,10 +796,31 @@ bool PajeContainer::checkTimeOrder (PajeEvent *event)
   double time = event->time();
   PajeType *type = event->type();
   PajeTraceEvent *traceEvent = event->traceEvent();
-  return checkTimeOrder (time, type, traceEvent);
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
+  if(rastroTraceEvent == NULL){
+    return checkTimeOrder (time, type, traceEvent);
+  }else{
+    return checkTimeOrder (time, type, rastroTraceEvent);
+  }
 }
 
 bool PajeContainer::checkTimeOrder (double time, PajeType *type, PajeTraceEvent *traceEvent)
+{
+  std::vector<PajeEntity*> *v = &entities[type];
+  if (v->size()){
+    PajeEntity *last = entities[type].back();
+    if ( (last && last->startTime() > time) ||
+         (last && last->endTime() != -1 && last->endTime() > time)){
+      std::stringstream eventdesc;
+      eventdesc << *traceEvent;
+      throw PajeSimulationException ("Illegal, trace is not time-ordered in "+eventdesc.str());
+      return false;
+    }
+  }
+  return true;
+}
+
+bool PajeContainer::checkTimeOrder (double time, PajeType *type, PajeRastroTraceEvent *traceEvent)
 {
   std::vector<PajeEntity*> *v = &entities[type];
   if (v->size()){
@@ -787,9 +875,16 @@ PajeContainer *PajeContainer::pajeCreateContainer (double time, PajeType *type, 
 void PajeContainer::pajeDestroyContainer (double time, PajeEvent *event)
 {
   PajeTraceEvent *traceEvent = event->traceEvent();
+  PajeRastroTraceEvent *rastroTraceEvent = event->rastroTraceEvent();
+
   if (_destroyed){
     std::stringstream line;
-    line << *traceEvent;
+    if(rastroTraceEvent == NULL)
+    {
+      line << *traceEvent;
+    }else{
+      line << *rastroTraceEvent;
+    }
     std::stringstream desc;
     desc << *this;
     throw PajeContainerException ("Container '"+desc.str()+"' already destroyed in "+line.str());

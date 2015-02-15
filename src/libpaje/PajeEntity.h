@@ -176,6 +176,8 @@ private:
 
 public:
   PajeUserEvent (PajeContainer *container, PajeType *type, double time, PajeValue *value, PajeTraceEvent *event);
+  PajeUserEvent (PajeContainer *container, PajeType *type, double time, PajeValue *value, PajeRastroTraceEvent *event);
+
   PajeValue *value (void) const;
   std::string description (void) const;
 };
@@ -207,6 +209,8 @@ private:
 
 public:
   PajeUserVariable (PajeContainer *container, PajeType *type, double time, double value, PajeTraceEvent *event);
+  PajeUserVariable (PajeContainer *container, PajeType *type, double time, double value, PajeRastroTraceEvent *event);
+
   std::string description (void) const;
 
   void setDoubleValue (double value);
@@ -227,6 +231,8 @@ private:
 
 public:
   PajeUserLink (PajeContainer *container, PajeType *type, double time, PajeValue *value, std::string key, PajeContainer *startContainer, PajeTraceEvent *event);
+  PajeUserLink (PajeContainer *container, PajeType *type, double time, PajeValue *value, std::string key, PajeContainer *startContainer, PajeRastroTraceEvent *event);
+
   std::string description (void) const;
 
   void setStartContainer (PajeContainer *startContainer);
