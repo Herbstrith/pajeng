@@ -23,7 +23,7 @@
 #include "PajeException.h"
 #include "PajeEventDecoder.h"
 #include "PajeSimulator.h"
-#include "PajeBinaryReader.h"
+#include "PajeRastroReader.h"
 #include <argp.h>
 
 #define VALIDATE_INPUT_SIZE 2
@@ -38,7 +38,7 @@ static struct argp_option options[] = {
   {"ignore-incomplete-links", 'z', 0, OPTION_ARG_OPTIONAL, "Ignore incomplete links (not recommended)"},
   {"quiet", 'q', 0, OPTION_ARG_OPTIONAL, "Do not dump, only simulate"},
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
-  {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use rastro reader"},
+  {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
   {"user-defined", 'u', 0, OPTION_ARG_OPTIONAL, "Dump user-defined fields"},
   { 0 }
 };
@@ -52,7 +52,7 @@ struct arguments {
   int quiet;
   int flex;
   int userDefined;
-  int rastro;
+  int rastroReader;
 };
 
 static error_t parse_options (int key, char *arg, struct argp_state *state)
@@ -66,7 +66,7 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 'z': arguments->ignoreIncompleteLinks = 1; break;
   case 'q': arguments->quiet = 1; break;
   case 'f': arguments->flex = 1; break;
-  case 'r': arguments->rastro = 1; break;
+  case 'r': arguments->rastroReader = 1; break;
   case 'u': arguments->userDefined = 1; break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {
@@ -93,6 +93,10 @@ void dump (struct arguments *arguments, PajeSimulator *simulator)
 {
   double start = arguments->start;
   double end = arguments->end;
+  if(arguments->rastroReader)
+     end = -simulator->endTime();
+    
+    printf("%lf",simulator->endTime());
   if (start == -1) start = simulator->startTime();
   if (end == -1) end = simulator->endTime();
 
@@ -115,6 +119,9 @@ void dump (struct arguments *arguments, PajeSimulator *simulator)
     containedTypes = simulator->containedTypesForContainerType (container->type());
     for (it = containedTypes.begin(); it != containedTypes.end(); it++){
       PajeType *type = *it;
+      /*std::cout << type->name() << "," << container->identifier();
+                std::cout << std::endl;
+*/
       if (simulator->isContainerType (type)){
         std::vector<PajeContainer*> children;
         std::vector<PajeContainer*>::iterator it;
@@ -131,13 +138,12 @@ void dump (struct arguments *arguments, PajeSimulator *simulator)
                                                                     end);
         for (it = entities.begin(); it != entities.end(); it++){
           PajeEntity *entity = *it;
-
           //output entity description
           std::cout << entity->description();
-	  if (arguments->userDefined){
-	    std::cout << entity->extraDescription(true);
-	  }
-	  std::cout << std::endl;
+          if (arguments->userDefined){
+            std::cout << entity->extraDescription(true);
+          }
+          std::cout << std::endl;
         }
       }
     }
@@ -153,7 +159,7 @@ int main (int argc, char **argv)
     fprintf(stderr, "%s, error during the parsing of parameters\n", argv[0]);
     return 1;
   }
-
+std::cout << "-";
   PajeComponent *reader;
   PajeEventDecoder *decoder;
   PajeSimulator *simulator;
@@ -165,48 +171,57 @@ int main (int argc, char **argv)
     //alloc reader
     if (arguments.flex){
       if (arguments.input_size == 0){
-	reader = new PajeFlexReader(definitions);
+        reader = new PajeFlexReader(definitions);
       }else{
-	reader = new PajeFlexReader(std::string(arguments.input[0]), definitions);
+        reader = new PajeFlexReader(std::string(arguments.input[0]), definitions);
       }
     }else{
-      if (arguments.rastro){
-		  reader = new PajeBinaryReader(definitions,arguments.input[0]);
-	  }
-	  else
-	  {
-		  if (arguments.input_size == 0){
-		reader = new PajeFileReader();
-		  }else{
-		reader = new PajeFileReader (std::string(arguments.input[0]));
-		  }
-		}
+      if (arguments.rastroReader){
+        reader = new PajeRastroReader(definitions,arguments.input[0]);
+      }else{
+        if (arguments.input_size == 0){
+          reader = new PajeFileReader();
+        }else{
+          reader = new PajeFileReader (std::string(arguments.input[0]));
+        }
+      }
     }
 
     //alloc decoder and simulator
-    if (!arguments.flex || !arguments.rastro){
+    if (!arguments.flex && !arguments.rastroReader){
       decoder = new PajeEventDecoder(definitions);
     }
-    simulator = new PajeSimulator (arguments.stopat, arguments.ignoreIncompleteLinks);
 
-    //connect components
-    if (arguments.flex || arguments.rastro){
-      reader->setOutputComponent (simulator);
+    if(arguments.rastroReader)
+		{
+      //call the constructor for the Rastro PajeSimulator
+      simulator = new PajeSimulator (true);
+			reader->setOutputComponent (simulator);
       simulator->setInputComponent (reader);
-    }else{
-      reader->setOutputComponent (decoder);
-      decoder->setInputComponent (reader);
-      decoder->setOutputComponent (simulator);
-      simulator->setInputComponent (decoder);
+		}else{
+      simulator = new PajeSimulator (arguments.stopat, arguments.ignoreIncompleteLinks);
+
+      //connect components
+      if (arguments.flex){
+        reader->setOutputComponent (simulator);
+        simulator->setInputComponent (reader);
+      }else{
+        reader->setOutputComponent (decoder);
+        decoder->setInputComponent (reader);
+        decoder->setOutputComponent (simulator);
+        simulator->setInputComponent (decoder);
+      }
     }
   }catch (PajeException& e){
     e.reportAndExit ();
   }
-
   //read and simulate
-  try {
+  try {      
     reader->startReading ();
     while (reader->hasMoreData() && simulator->keepSimulating()){
+      std::vector<PajeContainer*> stack;
+      stack.push_back (simulator->rootInstance());
+      //std::cout << stack.size ()<<" ";
       reader->readNextChunk ();
     }
     reader->finishedReading ();
@@ -219,10 +234,10 @@ int main (int argc, char **argv)
   }
 
   delete reader;
-  if (!arguments.flex){
+  if (!arguments.flex && !arguments.rastroReader){
     delete decoder;
   }
-  delete decoder;
+  //delete decoder;
   delete simulator;
   delete definitions;
   return 0;

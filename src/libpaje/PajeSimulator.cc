@@ -261,7 +261,6 @@ void PajeSimulator::pajeDefineContainerType (PajeTraceEvent *event)
 
 void PajeSimulator::pajeDefineLinkType (PajeTraceEvent *event)
 {
-printf("define link");
   std::string name;
   std::string type;
   std::string starttype;
@@ -441,13 +440,14 @@ void PajeSimulator::pajeDefineEntityValue (PajeTraceEvent *event)
   std::string typestr;
   std::string alias;
   std::string color;
+  PajeRastroTraceEvent  *RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(event);	
+
   if(!useRastroEvent){
     name = event->valueForField (PAJE_Name);
     typestr = event->valueForField (PAJE_Type);
     color = event->valueForField (PAJE_Color);
     alias = event->valueForField (PAJE_Alias);
   }else{
-    PajeRastroTraceEvent  *RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(event);	
     name = RastrotraceEvent->valueForStringField (PAJE_Name);
     typestr = RastrotraceEvent->valueForStringField (PAJE_Type);
     color = RastrotraceEvent->valueForStringField (PAJE_Color);
@@ -488,7 +488,13 @@ void PajeSimulator::pajeDefineEntityValue (PajeTraceEvent *event)
   }
 
   //validate the color, if provided
-  PajeColor *pajeColor = getColor (color, event);
+  PajeColor *pajeColor;
+  if(!useRastroEvent)
+  {
+    pajeColor = getColor (color, event);
+  }else{
+    pajeColor = getColor (color, RastrotraceEvent);
+  }
 
   type->addValue (alias, name, pajeColor);
 }
@@ -567,7 +573,7 @@ void PajeSimulator::pajeCreateContainer (PajeTraceEvent *traceEvent)
   {
      newContainer = container->pajeCreateContainer (lastKnownTime, type, traceEvent, stopSimulationAtTime);
   }else{     
-      newContainer = container->pajeCreateContainer (lastKnownTime, type, RastrotraceEvent, stopSimulationAtTime);
+     newContainer = container->pajeCreateContainer (lastKnownTime, type, RastrotraceEvent, stopSimulationAtTime);
   }
 
   if (newContainer){  
@@ -1000,7 +1006,6 @@ void PajeSimulator::pajeResetState (PajeTraceEvent *traceEvent)
 
 void PajeSimulator::pajeSetVariable (PajeTraceEvent *traceEvent)
 {
-
   std::string time;
   std::string typestr;
   std::string containerstr;

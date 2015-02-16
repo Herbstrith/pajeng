@@ -23,7 +23,6 @@
 #include "PajeEventDecoder.h"
 #include "PajeSimulator.h"
 #include "PajeException.h"
-#include "PajeBinaryReader.h"
 #include "PajeRastroReader.h"
 #include <argp.h>
 
@@ -130,19 +129,18 @@ int main (int argc, char **argv)
 
 
     //alloc decoder and simulator
-    if (!arguments.flex){
+    if (!arguments.flex && !arguments.rastroReader){
       decoder = new PajeEventDecoder(definitions);
     }
     
-    simulator = new PajeSimulator ();
     if(arguments.rastroReader)
 		{
+      //call the constructor for the Rastro PajeSimulator
       simulator = new PajeSimulator (true);
 			reader->setOutputComponent (simulator);
       simulator->setInputComponent (reader);
-		}
-	
-    else{
+		}else{
+      simulator = new PajeSimulator ();
       //connect components
       if (arguments.flex){
         reader->setOutputComponent (simulator);

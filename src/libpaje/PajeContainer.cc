@@ -251,7 +251,6 @@ void PajeContainer::rastroDemuxer (PajeEvent *event)
   if (_destroyed){
     return;
   }
-
   double lastKnownTime = event->time();
   //stop the simulation before the end
   if (stopSimulationAtTime != -1){
