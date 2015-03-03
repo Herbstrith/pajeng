@@ -16,7 +16,7 @@
 */
 #include "PajeBinaryReader.h"
 #include "PajeException.h"
-#include <PajeDefinitions.h>
+#include "PajeDefinitions.h"
 #include <stdlib.h>
 
 PajeBinaryReader::PajeBinaryReader (PajeDefinitions *definitions, char *file_rst)

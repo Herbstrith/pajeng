@@ -17,7 +17,7 @@
 #include "PajeRastroReader.h"
 #include "PajeException.h"
 #include "PajeRastroTraceEvent.h"
-#include <PajeDefinitions.h>
+#include "PajeDefinitions.h"
 #include <stdlib.h>
 
 PajeRastroReader::PajeRastroReader (PajeDefinitions *definitions, char *file_rst)
