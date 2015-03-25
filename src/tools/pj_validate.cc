@@ -22,6 +22,7 @@
 #include "PajeFlexReader.h"
 #include "PajeEventDecoder.h"
 #include "PajeSimulator.h"
+#include "PajeRastroSimulator.h"
 #include "PajeException.h"
 #include "PajeRastroReader.h"
 #include <argp.h>
@@ -98,7 +99,8 @@ int main (int argc, char **argv)
   PajeComponent *reader = NULL;
   PajeEventDecoder *decoder = NULL;
   PajeSimulator *simulator = NULL;
-
+  PajeRastroSimulator *rastroSimulator = NULL;
+  
   //the global PajeDefinitions object
   PajeDefinitions *definitions = new PajeDefinitions (arguments.noStrict ? false : true); 
 
@@ -127,7 +129,6 @@ int main (int argc, char **argv)
       }
     }
 
-
     //alloc decoder and simulator
     if (!arguments.flex && !arguments.rastroReader){
       decoder = new PajeEventDecoder(definitions);
@@ -136,9 +137,9 @@ int main (int argc, char **argv)
     if(arguments.rastroReader)
 		{
       //call the constructor for the Rastro PajeSimulator
-      simulator = new PajeSimulator (true);
-			reader->setOutputComponent (simulator);
-      simulator->setInputComponent (reader);
+      rastroSimulator = new PajeRastroSimulator (true);
+			reader->setOutputComponent (rastroSimulator);
+      rastroSimulator->setInputComponent (reader);
 		}else{
       simulator = new PajeSimulator ();
       //connect components
@@ -177,12 +178,18 @@ int main (int argc, char **argv)
   }
 
   if (!arguments.quiet){
-    simulator->report();
+    if(arguments.rastroReader)
+    {
+      rastroSimulator->report();
+    }else{
+      simulator->report();
+    }  
   }
 
   delete reader;
   delete decoder;
   delete simulator;
+  delete rastroSimulator;
   delete definitions;
   return 0;
 }

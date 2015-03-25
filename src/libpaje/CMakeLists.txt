@@ -36,6 +36,7 @@ SET(LIBPAJE_HEADERS
   PajeBinaryReader.h
   PajeRastroTraceEvent.h
   PajeRastroReader.h
+  PajeRastroSimulator.h
 )
 SET(LIBPAJE_SOURCES
   PajeEventDefinition.cc
@@ -59,6 +60,9 @@ SET(LIBPAJE_SOURCES
   PajeBinaryReader.cc
   PajeRastroTraceEvent.cc
   PajeRastroReader.cc
+  PajeRastroSimulator.cc
+  PajeRastroSimulator+Queries.cc
+  PajeRastroSimulator+Commands.cc
 )
 
 FIND_PACKAGE(Boost REQUIRED)

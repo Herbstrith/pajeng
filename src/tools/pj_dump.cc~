@@ -239,6 +239,7 @@ std::cout << "-";
     delete decoder;
   }
 
+  simulator->report();
   //delete decoder;
   delete simulator;
   delete definitions;
