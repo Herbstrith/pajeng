@@ -23,32 +23,34 @@ PajeEvent::PajeEvent (PajeTraceEvent *event, PajeContainer *container, PajeType 
   _container = container;
   _type = type;
   _rastroEvent = NULL;
-  //extracing time
-  std::string t = _event->valueForField (PAJE_Time);
-  if (t.length() == 0){
-    PajeSimulationException ("Can't get time from trace event.");
+  PajeRastroTraceEvent *RastrotraceEvent = NULL ;
+  RastrotraceEvent = dynamic_cast<PajeRastroTraceEvent*>(event);	
+  if(RastrotraceEvent == NULL)
+  {
+    //extracing time
+    std::string t = _event->valueForField (PAJE_Time);
+    
+    if (t.length() == 0){
+      PajeSimulationException ("Can't get time from trace event.");
+    }
+    _time = atof(t.c_str());
+  }else{
+    _rastroEvent = RastrotraceEvent;
+    //extracing time
+    double t = _rastroEvent->valueForDoubleField (PAJE_Time);
+    if (t < 0){
+      PajeSimulationException ("Can't get time from trace event.");
+    }
+    _time = t;
   }
-  _time = atof(t.c_str());
 }
 
-PajeEvent::PajeEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type)
-{
-  _rastroEvent = event;
-  _container = container;
-  _type = type;
-  
-  //extracing time
-  double t = _rastroEvent->valueForDoubleField (PAJE_Time);
-  if (t < 0){
-    PajeSimulationException ("Can't get time from trace event.");
-  }
-  _time = t;
-}
 
 PajeTraceEvent *PajeEvent::traceEvent (void)
 {
   return _event;
 }
+
 
 PajeRastroTraceEvent *PajeEvent::rastroTraceEvent (void)
 {
@@ -101,12 +103,6 @@ PajeCategorizedEvent::PajeCategorizedEvent (PajeTraceEvent *event, PajeContainer
   _value = value;
 }
 
-PajeCategorizedEvent::PajeCategorizedEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
-  : PajeEvent (event, container, type)
-{
-  _value = value;
-}
-
 PajeValue *PajeCategorizedEvent::value (void)
 {
   return _value;
@@ -122,20 +118,11 @@ PajeStateEvent::PajeStateEvent (PajeTraceEvent *event, PajeContainer *container,
 {
 }
 
-PajeStateEvent::PajeStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
-  : PajeCategorizedEvent (event, container, type, value)
-{
-}
-
 PajeEventEvent::PajeEventEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
   : PajeCategorizedEvent (event, container, type, value)
 {
 }
 
-PajeEventEvent::PajeEventEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
-  : PajeCategorizedEvent (event, container, type, value)
-{
-}
 
 PajeVariableEvent::PajeVariableEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, double value)
   : PajeEvent (event, container, type)
@@ -143,11 +130,6 @@ PajeVariableEvent::PajeVariableEvent (PajeTraceEvent *event, PajeContainer *cont
   _doubleValue = value;
 }
 
-PajeVariableEvent::PajeVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value)
-  : PajeEvent (event, container, type)
-{
-  _doubleValue = value;
-}
 
 std::string PajeVariableEvent::kind (void)
 {
@@ -166,12 +148,6 @@ PajeLinkEvent::PajeLinkEvent (PajeTraceEvent *event, PajeContainer *container, P
   _key = key;
 }
 
-PajeLinkEvent::PajeLinkEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key)
-  : PajeCategorizedEvent (event, container, type, value)
-{
-  _linkedContainer = linkedContainer;
-  _key = key;
-}
 
 std::string PajeLinkEvent::key (void)
 {
@@ -185,56 +161,32 @@ PajeNewEventEvent::PajeNewEventEvent (PajeTraceEvent *event, PajeContainer *cont
 {
 }
 
-PajeNewEventEvent::PajeNewEventEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
-  : PajeEventEvent (event, container, type, value)
-{
-}
 
 PajeSetStateEvent::PajeSetStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
   : PajeStateEvent (event, container, type, value)
 {
 }
 
-PajeSetStateEvent::PajeSetStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
-  : PajeStateEvent (event, container, type, value)
-{
-}
 
 PajePushStateEvent::PajePushStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
   : PajeStateEvent (event, container, type, value)
 {
 }
 
-PajePushStateEvent::PajePushStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value)
-  : PajeStateEvent (event, container, type, value)
-{
-}
 
 PajePopStateEvent::PajePopStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type)
   : PajeStateEvent (event, container, type, NULL)
 {
 }
 
-PajePopStateEvent::PajePopStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type)
-  : PajeStateEvent (event, container, type, NULL)
-{
-}
 
 PajeResetStateEvent::PajeResetStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type)
   : PajeStateEvent (event, container, type, NULL)
 {
 }
 
-PajeResetStateEvent::PajeResetStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type)
-  : PajeStateEvent (event, container, type, NULL)
-{
-}
 
 PajeSetVariableEvent::PajeSetVariableEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, double value)
-  : PajeVariableEvent (event, container, type, value)
-{
-}
-PajeSetVariableEvent::PajeSetVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value)
   : PajeVariableEvent (event, container, type, value)
 {
 }
@@ -244,27 +196,12 @@ PajeAddVariableEvent::PajeAddVariableEvent (PajeTraceEvent *event, PajeContainer
 {
 }
 
-PajeAddVariableEvent::PajeAddVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value)
-  : PajeVariableEvent (event, container, type, value)
-{
-}
-
 PajeSubVariableEvent::PajeSubVariableEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, double value)
   : PajeVariableEvent (event, container, type, value)
 {
 }
 
-PajeSubVariableEvent::PajeSubVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value)
-  : PajeVariableEvent (event, container, type, value)
-{
-}
-
 PajeStartLinkEvent::PajeStartLinkEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key)
-  : PajeLinkEvent (event, container, type, value, linkedContainer, key)
-{
-}
-
-PajeStartLinkEvent::PajeStartLinkEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key)
   : PajeLinkEvent (event, container, type, value, linkedContainer, key)
 {
 }
@@ -279,22 +216,12 @@ PajeEndLinkEvent::PajeEndLinkEvent (PajeTraceEvent *event, PajeContainer *contai
 {
 }
 
-PajeEndLinkEvent::PajeEndLinkEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key)
-  : PajeLinkEvent (event, container, type, value, linkedContainer, key)
-{
-}
-
 PajeContainer *PajeEndLinkEvent::endContainer (void)
 {
   return _linkedContainer;
 }
 
 PajeDestroyContainerEvent::PajeDestroyContainerEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type)
-  : PajeEvent (event, container, type)
-{
-}
-
-PajeDestroyContainerEvent::PajeDestroyContainerEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type)
   : PajeEvent (event, container, type)
 {
 }

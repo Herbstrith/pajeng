@@ -25,7 +25,7 @@ class PajeValue;
 
 class PajeEvent : public PajeObject
 {
-private:
+public:
   PajeTraceEvent *_event;
   PajeContainer *_container;
   PajeType *_type;
@@ -35,7 +35,6 @@ private:
 
 public:
   PajeEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type);
-  PajeEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type);
 
   PajeTraceEvent *traceEvent (void);
   PajeRastroTraceEvent *rastroTraceEvent (void);
@@ -58,7 +57,6 @@ class PajeCategorizedEvent : public PajeEvent
 
 public:
   PajeCategorizedEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
-  PajeCategorizedEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
   PajeValue *value (void);
   std::string kind (void);
 };
@@ -67,7 +65,6 @@ class PajeStateEvent : public PajeCategorizedEvent
 {
 public:
   PajeStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
-  PajeStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
 
 };
 
@@ -75,7 +72,6 @@ class PajeEventEvent : public PajeCategorizedEvent
 {
 public:
   PajeEventEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
-  PajeEventEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
 
 };
 
@@ -86,7 +82,6 @@ private:
 
 public:
   PajeVariableEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, double value);
-  PajeVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value);
   double doubleValue (void);
   std::string kind (void);
 };
@@ -99,7 +94,6 @@ private:
   std::string _key;
 public:
   PajeLinkEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key);
-  PajeLinkEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key);
   std::string key (void);
 };
 
@@ -109,51 +103,44 @@ class PajeNewEventEvent : public PajeEventEvent
 {
 public:
   PajeNewEventEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
-  PajeNewEventEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
 };
 
 class PajeSetStateEvent : public PajeStateEvent
 {
 public:
   PajeSetStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
-  PajeSetStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
 };
 
 class PajePushStateEvent : public PajeStateEvent
 {
 public:
   PajePushStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
-  PajePushStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value);
 };
 
 class PajePopStateEvent : public PajeStateEvent
 {
 public:
   PajePopStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type);
-  PajePopStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type);
-
 };
 
 class PajeResetStateEvent : public PajeStateEvent
 {
 public:
   PajeResetStateEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type);
-  PajeResetStateEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type);
-
+  
 };
 
 class PajeSetVariableEvent : public PajeVariableEvent
 {
 public:
   PajeSetVariableEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, double value);
-  PajeSetVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value);
+
 };
 
 class PajeAddVariableEvent : public PajeVariableEvent
 {
 public:
   PajeAddVariableEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, double value);
-  PajeAddVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value);
 
 };
 
@@ -161,14 +148,13 @@ class PajeSubVariableEvent : public PajeVariableEvent
 {
 public:
   PajeSubVariableEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, double value);
-  PajeSubVariableEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, double value);
+
 };
 
 class PajeStartLinkEvent : public PajeLinkEvent
 {
 public:
   PajeStartLinkEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key);
-  PajeStartLinkEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key);
   PajeContainer *startContainer (void);
 };
 
@@ -176,7 +162,6 @@ class PajeEndLinkEvent : public PajeLinkEvent
 {
 public:
   PajeEndLinkEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key);
-  PajeEndLinkEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type, PajeValue *value, PajeContainer *linkedContainer, std::string key);
   PajeContainer *endContainer (void);
 };
 
@@ -184,7 +169,6 @@ class PajeDestroyContainerEvent : public PajeEvent
 {
 public:
   PajeDestroyContainerEvent (PajeTraceEvent *event, PajeContainer *container, PajeType *type);
-  PajeDestroyContainerEvent (PajeRastroTraceEvent *event, PajeContainer *container, PajeType *type);
 
   std::string kind (void);
 };
