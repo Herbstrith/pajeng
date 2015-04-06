@@ -642,7 +642,7 @@ void PajeSimulator::pajeDestroyContainer (PajeTraceEvent *traceEvent)
     container->demuxer(&event);
   }else{
     PajeDestroyContainerEvent event (RastrotraceEvent, container, containerType);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
 
 }
@@ -718,7 +718,7 @@ void PajeSimulator::pajeNewEvent (PajeTraceEvent *traceEvent)
     container->demuxer(&event);
   }else{
     PajeNewEventEvent event(RastrotraceEvent, container, type, val);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
   
 }
@@ -731,7 +731,7 @@ void PajeSimulator::pajeSetState (PajeTraceEvent *traceEvent)
   std::string containerstr;
   std::string value;
 	
-  PajeRastroTraceEvent  *RastrotraceEvent ;
+  PajeRastroTraceEvent  *RastrotraceEvent;
   if(!useRastroEvent){
     time = traceEvent->valueForField (PAJE_Time);
     typestr = traceEvent->valueForField (PAJE_Type);
@@ -794,7 +794,7 @@ void PajeSimulator::pajeSetState (PajeTraceEvent *traceEvent)
     container->demuxer(&event);
   }else{
     PajeSetStateEvent event(RastrotraceEvent, container, type, val);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
   
 }
@@ -869,7 +869,7 @@ void PajeSimulator::pajePushState (PajeTraceEvent *traceEvent)
     container->demuxer (&event);
   }else{
     PajePushStateEvent event(RastrotraceEvent, container, type, val);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
   
 }
@@ -934,7 +934,7 @@ void PajeSimulator::pajePopState (PajeTraceEvent *traceEvent)
     container->demuxer (&event);
   }else{
     PajePopStateEvent event(RastrotraceEvent, container, type);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
   
 }
@@ -999,7 +999,7 @@ void PajeSimulator::pajeResetState (PajeTraceEvent *traceEvent)
     container->demuxer (&event);
   }else{
     PajeResetStateEvent event(RastrotraceEvent, container, type);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
 
 }
@@ -1062,16 +1062,15 @@ void PajeSimulator::pajeSetVariable (PajeTraceEvent *traceEvent)
     throw PajeTypeException ("Type '"+ctype1.str()+"' is not child type of container type '"+ctype2.str()+"' in "+eventdesc.str());
   }
 
-  
   if(!useRastroEvent){
     v = strtof (value.c_str(), NULL);
     PajeSetVariableEvent event (traceEvent, container, type, v);
     container->demuxer(&event);
   }else{
     PajeSetVariableEvent event(RastrotraceEvent, container, type, v);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
-  
+  // container->demuxer (&event);
 }
 
 void PajeSimulator::pajeAddVariable (PajeTraceEvent *traceEvent)
@@ -1140,7 +1139,7 @@ void PajeSimulator::pajeAddVariable (PajeTraceEvent *traceEvent)
     container->demuxer(&event);
   }else{
     PajeAddVariableEvent event(RastrotraceEvent, container, type, v);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
   
 }
@@ -1210,7 +1209,7 @@ void PajeSimulator::pajeSubVariable (PajeTraceEvent *traceEvent)
     container->demuxer(&event);
   }else{
     PajeSubVariableEvent event(RastrotraceEvent, container, type, v);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
 
 }
@@ -1315,7 +1314,7 @@ void PajeSimulator::pajeStartLink (PajeTraceEvent *traceEvent)
     container->demuxer(&event);
   }else{
     PajeStartLinkEvent event(RastrotraceEvent, container, type, val, startcontainer, key);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
   
 
@@ -1416,7 +1415,7 @@ void PajeSimulator::pajeEndLink (PajeTraceEvent *traceEvent)
     container->demuxer(&event);
   }else{
     PajeEndLinkEvent event (RastrotraceEvent, container, type, val, endcontainer, key);
-    container->rastroDemuxer (&event);
+    container->demuxer (&event);
   }
   
 

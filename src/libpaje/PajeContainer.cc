@@ -230,38 +230,13 @@ void PajeContainer::demuxer (PajeEvent *event)
   }
 
   //change the simulated behavior according to the event
-  PajeEventId eventId = event->traceEvent()->pajeEventId();
-  if (eventId < PajeEventIdCount){
-    if (invocation[eventId]){
-      CALL_MEMBER_PAJE_CONTAINER(*this,invocation[eventId])(event);
-    }else{
-      throw PajeSimulationException ("Asked to simulate something I don't know how to simulate");
-    }
+  PajeEventId eventId;
+  if(event->rastroTraceEvent() == NULL){
+    eventId = event->traceEvent()->pajeEventId();
   }else{
-    throw PajeSimulationException ("Unknow event id.");
+    eventId = event->rastroTraceEvent()->pajeEventId();
   }
-
-  //update container endtime
-  setEndTime (event->time());
-}
-
-void PajeContainer::rastroDemuxer (PajeEvent *event)
-{
-  //check if I'm stopped
-  if (_destroyed){
-    return;
-  }
-  double lastKnownTime = event->time();
-  //stop the simulation before the end
-  if (stopSimulationAtTime != -1){
-    if (lastKnownTime > stopSimulationAtTime){
-      pajeDestroyContainer (stopSimulationAtTime, event);
-      return;
-    }
-  }
-
-  //change the simulated behavior according to the event
-  PajeEventId eventId = event->rastroTraceEvent()->pajeEventId();
+  
   if (eventId < PajeEventIdCount){
     if (invocation[eventId]){
       CALL_MEMBER_PAJE_CONTAINER(*this,invocation[eventId])(event);
