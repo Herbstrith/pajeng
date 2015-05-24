@@ -70,6 +70,7 @@ void PajeSimulator::init (void)
   invocation[PajeSubVariableEventId] = &PajeSimulator::pajeSubVariable;
   invocation[PajeStartLinkEventId] = &PajeSimulator::pajeStartLink;
   invocation[PajeEndLinkEventId] = &PajeSimulator::pajeEndLink;
+  invocation[PajeTraceFileEventId] = &PajeSimulator::pajeTraceFile;
   rootType = new PajeContainerType ("0", "0", NULL);
   root = new PajeContainer (0, "0", "0", NULL, rootType, NULL);
   typeMap[rootType->identifier()] = rootType;
@@ -91,7 +92,7 @@ void PajeSimulator::report (void)
 
   std::vector<PajeType*> stack;
   stack.push_back (rootType);
-  while (stack.size()){
+  while (!stack.empty()){
     PajeType *last = stack.back();
     stack.pop_back();
     std::string name = typeid(*last).name();
@@ -100,7 +101,7 @@ void PajeSimulator::report (void)
     //push back more types
     if (this->isContainerType (last)){
       std::vector<PajeType*> children = this->containedTypesForContainerType(last);
-      while (children.size()){
+      while (!children.empty()){
         PajeType *x = children.back();
         stack.push_back (x);
         children.pop_back();
@@ -1420,4 +1421,11 @@ void PajeSimulator::pajeEndLink (PajeTraceEvent *traceEvent)
   }
   
 
+}
+
+void PajeSimulator::pajeTraceFile (PajeTraceEvent *traceEvent)
+{
+  std::string containerstr = traceEvent->valueForField (PAJE_Container);
+  std::string typestr = traceEvent->valueForField (PAJE_Type);
+  std::string filename = traceEvent->valueForField (PAJE_Filename);
 }

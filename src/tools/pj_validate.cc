@@ -14,17 +14,21 @@
     You should have received a copy of the GNU Public License
     along with PajeNG. If not, see <http://www.gnu.org/licenses/>.
 */
-#include <sys/time.h>
-#include <string>
-#include <iostream>
-#include <exception>
+/*before 
 #include "PajeFileReader.h"
 #include "PajeFlexReader.h"
 #include "PajeEventDecoder.h"
 #include "PajeSimulator.h"
 #include "PajeException.h"
 #include "PajeRastroReader.h"
+*/
+#include <sys/time.h>
+#include <string>
+#include <iostream>
+#include <exception>
+#include "PajeUnity.h"
 #include <argp.h>
+#include "libpaje_config.h"
 
 #define VALIDATE_INPUT_SIZE 2
 static char doc[] = "Checks if FILE, or standard input, strictly follows the Paje file format definition";
@@ -35,6 +39,7 @@ static struct argp_option options[] = {
   {"quiet", 'q', 0, OPTION_ARG_OPTIONAL, "Be quiet"},
   {"time", 't', 0, OPTION_ARG_OPTIONAL, "Print number of seconds to simulate input"},
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
+  {"version", 'v', 0, OPTION_ARG_OPTIONAL, "Print version of this binary"},
   {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
   { 0 }
 };
@@ -58,6 +63,7 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 'q': arguments->quiet = 1; break;
   case 'f': arguments->flex = 1; break;
   case 'r': arguments->rastroReader = 1;break;
+  case 'v': printf("%s\n", LIBPAJE_VERSION_STRING); exit(0); break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {
       /* Too many arguments. */
@@ -95,7 +101,26 @@ int main (int argc, char **argv)
     return 1;
   }
 
-  PajeComponent *reader = NULL;
+  PajeUnity *unity = new PajeUnity (arguments.flex,
+            arguments.rastroReader,
+				    !arguments.noStrict,
+				    std::string(arguments.input[0]),
+				      -1,
+				    0, 0);
+
+  if (arguments.time){
+    printf ("%f\n", unity->getTime());
+  }
+
+  if (!arguments.quiet){
+    unity->report();
+  }
+
+  delete unity;
+  return 0;
+
+  /*before
+PajeComponent *reader = NULL;
   PajeEventDecoder *decoder = NULL;
   PajeSimulator *simulator = NULL;
 
@@ -185,4 +210,5 @@ int main (int argc, char **argv)
   delete simulator;
   delete definitions;
   return 0;
+*/
 }
