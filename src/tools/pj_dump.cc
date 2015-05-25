@@ -14,17 +14,23 @@
     You should have received a copy of the GNU Public License
     along with PajeNG. If not, see <http://www.gnu.org/licenses/>.
 */
-#include <stdlib.h>
-#include <string>
-#include <iostream>
-#include <exception>
-#include "PajeFlexReader.h"
+
+/*#before include "PajeFlexReader.h"
 #include "PajeFileReader.h"
 #include "PajeException.h"
 #include "PajeEventDecoder.h"
 #include "PajeSimulator.h"
-#include "PajeRastroReader.h"
+#include "PajeRastroReader.h"*/
+#include <stdlib.h>
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <exception>
+#include "PajeUnity.h"
 #include <argp.h>
+#include "libpaje_config.h"
+
+extern int dumpFloatingPointPrecision;
 
 #define VALIDATE_INPUT_SIZE 2
 static char doc[] = "Dumps FILE, or standard input, in a CSV-like textual format";
@@ -40,6 +46,9 @@ static struct argp_option options[] = {
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
   {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
   {"user-defined", 'u', 0, OPTION_ARG_OPTIONAL, "Dump user-defined fields"},
+  {"probabilistic", 'p', "TYPENAME", 0, "Dump global states based on TYPENAME"},
+  {"float-precision", 'l', "PRECISION", 0, "Precision of floating point numbers"},
+  {"version", 'v', 0, OPTION_ARG_OPTIONAL, "Print version of this binary"},
   { 0 }
 };
 
@@ -53,6 +62,7 @@ struct arguments {
   int flex;
   int userDefined;
   int rastroReader;
+  char *probabilistic;
 };
 
 static error_t parse_options (int key, char *arg, struct argp_state *state)
@@ -68,6 +78,9 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 'f': arguments->flex = 1; break;
   case 'r': arguments->rastroReader = 1; break;
   case 'u': arguments->userDefined = 1; break;
+  case 'p': arguments->probabilistic = strdup(arg); break;
+  case 'l': dumpFloatingPointPrecision = atoi(arg); break;
+  case 'v': printf("%s\n", LIBPAJE_VERSION_STRING); exit(0); break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {
       /* Too many arguments. */
@@ -89,7 +102,7 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
 
 static struct argp argp = { options, parse_options, args_doc, doc };
 
-void dump (struct arguments *arguments, PajeSimulator *simulator)
+void dump (struct arguments *arguments, PajeComponent *simulator)
 {
   double start = arguments->start;
   double end = arguments->end;
@@ -103,7 +116,7 @@ void dump (struct arguments *arguments, PajeSimulator *simulator)
   std::vector<PajeContainer*> stack;
   stack.push_back (simulator->rootInstance());
 
-  while (stack.size ()){
+  while (!stack.empty()){
     PajeContainer *container = stack.back();
     stack.pop_back ();
 
@@ -119,9 +132,6 @@ void dump (struct arguments *arguments, PajeSimulator *simulator)
     containedTypes = simulator->containedTypesForContainerType (container->type());
     for (it = containedTypes.begin(); it != containedTypes.end(); it++){
       PajeType *type = *it;
-      /*std::cout << type->name() << "," << container->identifier();
-                std::cout << std::endl;
-*/
       if (simulator->isContainerType (type)){
         std::vector<PajeContainer*> children;
         std::vector<PajeContainer*>::iterator it;
@@ -138,12 +148,13 @@ void dump (struct arguments *arguments, PajeSimulator *simulator)
                                                                     end);
         for (it = entities.begin(); it != entities.end(); it++){
           PajeEntity *entity = *it;
+
           //output entity description
           std::cout << entity->description();
-          if (arguments->userDefined){
-            std::cout << entity->extraDescription(true);
-          }
-          std::cout << std::endl;
+	  if (arguments->userDefined){
+	    std::cout << entity->extraDescription(true);
+	  }
+	  std::cout << std::endl;
         }
       }
     }
@@ -153,6 +164,37 @@ void dump (struct arguments *arguments, PajeSimulator *simulator)
 int main (int argc, char **argv)
 {
   struct arguments arguments;
+  bzero (&arguments, sizeof(struct arguments));
+  arguments.start = arguments.end = arguments.stopat = -1;
+  if (argp_parse (&argp, argc, argv, 0, 0, &arguments) == ARGP_KEY_ERROR){
+    fprintf(stderr, "%s, error during the parsing of parameters\n", argv[0]);
+    return 1;
+  }
+
+  PajeUnity *unity = new PajeUnity (arguments.flex,
+            arguments.rastroReader,
+				    !arguments.noStrict,
+				    std::string(arguments.input[0]),
+				    arguments.stopat,
+				    arguments.ignoreIncompleteLinks,
+				    arguments.probabilistic);
+
+  if (arguments.probabilistic){
+    delete unity;
+    return 0;
+  }
+  
+  if (!arguments.quiet){
+    dump (&arguments, unity);
+  }
+
+  delete unity;
+  return 0;
+
+
+
+/* before
+struct arguments arguments;
   bzero (&arguments, sizeof(struct arguments));
   arguments.start = arguments.end = arguments.stopat = -1;
   if (argp_parse (&argp, argc, argv, 0, 0, &arguments) == ARGP_KEY_ERROR){
@@ -241,4 +283,5 @@ std::cout << "-";
   delete simulator;
   delete definitions;
   return 0;
+*/
 }

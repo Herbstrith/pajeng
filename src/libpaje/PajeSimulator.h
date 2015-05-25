@@ -44,7 +44,7 @@ private:
   std::map<std::string,PajeContainer*> contMap;
   std::map<std::string,PajeContainer*> contNamesMap; //for names
 
-  double lastKnownTime;
+
   double stopSimulationAtTime;
   
   //if using the rastro trace event
@@ -57,7 +57,9 @@ private:
   double selectionStart;
   double selectionEnd;
 
-  void setLastKnownTime (PajeTraceEvent *event);
+protected:
+  double lastKnownTime;
+  virtual void setLastKnownTime (PajeTraceEvent *event);
   PajeColor *getColor (std::string color, PajeTraceEvent *event);
 
 public:
@@ -99,6 +101,8 @@ private:
 
   void pajeStartLink (PajeTraceEvent *event);
   void pajeEndLink (PajeTraceEvent *event);
+
+  void pajeTraceFile (PajeTraceEvent *event); //suport for multiple files
 
 public:
   //commands

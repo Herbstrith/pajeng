@@ -14,8 +14,11 @@
     You should have received a copy of the GNU Public License
     along with PajeNG. If not, see <http://www.gnu.org/licenses/>.
 */
+#include <iomanip>
 #include "PajeEntity.h"
 #include "PajeException.h"
+
+int dumpFloatingPointPrecision = 6;
 
 PajeEntity::PajeEntity (PajeContainer *container, PajeType *type, PajeTraceEvent *event)
 {
@@ -322,7 +325,8 @@ std::string PajeUserEvent::description (void) const
   description << (type()? type()->kind() : "NULL") << ", "
               << (container()? container()->name() : "NULL") << ", "
               << (type()? type()->name() : "NULL") << ", "
-              << startTime() << ", "
+              << std::fixed << std::setprecision(dumpFloatingPointPrecision)
+	      << startTime() << ", "
               << (value()? value()->name() : "NULL");
   return description.str();
 }
@@ -365,7 +369,8 @@ std::string PajeUserState::description (void) const
   description << (type()? type()->kind() : "NULL") << ", "
               << (container()? container()->name() : "NULL") << ", "
               << (type()? type()->name() : "NULL") << ", "
-              << startTime() << ", "
+              << std::fixed << std::setprecision(dumpFloatingPointPrecision)
+	      << startTime() << ", "
               << endTime() << ", "
               << duration() << ", "
               << imbrication << ", "
@@ -395,12 +400,12 @@ PajeUserVariable::PajeUserVariable (PajeContainer *container, PajeType *type, do
 
 std::string PajeUserVariable::description (void) const
 {
-
   std::stringstream description;
   description << (type()? type()->kind() : "NULL") << ", "
               << (container()? container()->name() : "NULL") << ", "
               << (type()? type()->name() : "NULL") << ", "
-              << startTime() << ", "
+              << std::fixed << std::setprecision(dumpFloatingPointPrecision)
+	      << startTime() << ", "
               << endTime() << ", "
               << duration() << ", "
               << doubleValue();
@@ -452,7 +457,8 @@ std::string PajeUserLink::description (void) const
   description << (type()? type()->kind() : "NULL") << ", "
               << (container()? container()->name() : "NULL") << ", "
               << (type()? type()->name() : "NULL") << ", "
-              << startTime() << ", "
+              << std::fixed << std::setprecision(dumpFloatingPointPrecision)
+	      << startTime() << ", "
               << endTime() << ", "
               << duration() << ", "
               << (value()? value()->name() : "NULL") << ", "
