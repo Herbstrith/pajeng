@@ -128,6 +128,12 @@ void PajeSimulator::setLastKnownTime (PajeTraceEvent *event)
       double evttime = atof(time.c_str());
       lastKnownTime = evttime;
     }
+  }else{
+    PajeRastroTraceEvent  *RastrotraceEvent = static_cast<PajeRastroTraceEvent*>(event);	
+    float time = RastrotraceEvent->valueForDoubleField (PAJE_Time);
+    if(time != -1){
+      lastKnownTime = time;
+    }
   }
   
 }

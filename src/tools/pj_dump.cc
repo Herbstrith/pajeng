@@ -106,10 +106,7 @@ void dump (struct arguments *arguments, PajeComponent *simulator)
 {
   double start = arguments->start;
   double end = arguments->end;
-  if(arguments->rastroReader)
-     end = -simulator->endTime();
-    
-    printf("%lf",simulator->endTime());
+
   if (start == -1) start = simulator->startTime();
   if (end == -1) end = simulator->endTime();
 
