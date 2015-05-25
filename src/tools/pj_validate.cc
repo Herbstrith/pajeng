@@ -14,14 +14,6 @@
     You should have received a copy of the GNU Public License
     along with PajeNG. If not, see <http://www.gnu.org/licenses/>.
 */
-/*before 
-#include "PajeFileReader.h"
-#include "PajeFlexReader.h"
-#include "PajeEventDecoder.h"
-#include "PajeSimulator.h"
-#include "PajeException.h"
-#include "PajeRastroReader.h"
-*/
 #include <sys/time.h>
 #include <string>
 #include <iostream>
@@ -118,97 +110,4 @@ int main (int argc, char **argv)
 
   delete unity;
   return 0;
-
-  /*before
-PajeComponent *reader = NULL;
-  PajeEventDecoder *decoder = NULL;
-  PajeSimulator *simulator = NULL;
-
-  //the global PajeDefinitions object
-  PajeDefinitions *definitions = new PajeDefinitions (arguments.noStrict ? false : true); 
-
-  try {
-
-    //alloc reader
-    if (arguments.flex){
-      if (arguments.input_size == 0){
-        reader = new PajeFlexReader(definitions);
-      }else{
-        std::string filename = arguments.input[0];
-        reader = new PajeFlexReader(filename, definitions);
-      }
-    }else{
-      if(arguments.rastroReader)
-      {
-        reader = new PajeRastroReader(definitions,arguments.input[0]);
-      }
-      else
-      {
-        if (arguments.input_size == 0){
-          reader = new PajeFileReader();
-        }else{
-          reader = new PajeFileReader (std::string(arguments.input[0]));
-        }
-      }
-    }
-
-
-    //alloc decoder and simulator
-    if (!arguments.flex && !arguments.rastroReader){
-      decoder = new PajeEventDecoder(definitions);
-    }
-    
-    if(arguments.rastroReader)
-		{
-      //call the constructor for the Rastro PajeSimulator
-      simulator = new PajeSimulator (true);
-			reader->setOutputComponent (simulator);
-      simulator->setInputComponent (reader);
-		}else{
-      simulator = new PajeSimulator ();
-      //connect components
-      if (arguments.flex){
-        reader->setOutputComponent (simulator);
-        simulator->setInputComponent (reader);
-      }else{
-        reader->setOutputComponent (decoder);
-        decoder->setInputComponent (reader);
-        decoder->setOutputComponent (simulator);
-        simulator->setInputComponent (decoder);
-      }
-    }
-  
-  }catch (PajeException& e){
-    e.reportAndExit ();
-  }
-
-  //read and simulate
-  double t1, t2;
-  if (arguments.time){
-    t1 = gettime();
-  }
-  try {
-    reader->startReading();
-    while (reader->hasMoreData()){
-      reader->readNextChunk();
-    }
-    reader->finishedReading();
-  }catch (PajeException& e){
-    e.reportAndExit();
-  }
-  if (arguments.time){
-    t2 = gettime();
-    printf ("%f\n", t2-t1);
-  }
-
-  if (!arguments.quiet){
-    simulator->report();
-  }
-
-  delete reader;
-  delete decoder;
-  delete simulator;
-  delete definitions;
-  return 0;
-*/
 }

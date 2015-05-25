@@ -14,13 +14,6 @@
     You should have received a copy of the GNU Public License
     along with PajeNG. If not, see <http://www.gnu.org/licenses/>.
 */
-
-/*#before include "PajeFlexReader.h"
-#include "PajeFileReader.h"
-#include "PajeException.h"
-#include "PajeEventDecoder.h"
-#include "PajeSimulator.h"
-#include "PajeRastroReader.h"*/
 #include <stdlib.h>
 #include <string>
 #include <iostream>
@@ -187,98 +180,4 @@ int main (int argc, char **argv)
 
   delete unity;
   return 0;
-
-
-
-/* before
-struct arguments arguments;
-  bzero (&arguments, sizeof(struct arguments));
-  arguments.start = arguments.end = arguments.stopat = -1;
-  if (argp_parse (&argp, argc, argv, 0, 0, &arguments) == ARGP_KEY_ERROR){
-    fprintf(stderr, "%s, error during the parsing of parameters\n", argv[0]);
-    return 1;
-  }
-std::cout << "-";
-  PajeComponent *reader;
-  PajeEventDecoder *decoder;
-  PajeSimulator *simulator;
-
-  //the global PajeDefinitions object
-  PajeDefinitions *definitions = new PajeDefinitions (arguments.noStrict ? false : true); 
-
-  try {
-    //alloc reader
-    if (arguments.flex){
-      if (arguments.input_size == 0){
-        reader = new PajeFlexReader(definitions);
-      }else{
-        reader = new PajeFlexReader(std::string(arguments.input[0]), definitions);
-      }
-    }else{
-      if (arguments.rastroReader){
-        reader = new PajeRastroReader(definitions,arguments.input[0]);
-      }else{
-        if (arguments.input_size == 0){
-          reader = new PajeFileReader();
-        }else{
-          reader = new PajeFileReader (std::string(arguments.input[0]));
-        }
-      }
-    }
-
-    //alloc decoder and simulator
-    if (!arguments.flex && !arguments.rastroReader){
-      decoder = new PajeEventDecoder(definitions);
-    }
-
-    if(arguments.rastroReader)
-		{
-      //call the constructor for the Rastro PajeSimulator
-      simulator = new PajeSimulator (true);
-			reader->setOutputComponent (simulator);
-      simulator->setInputComponent (reader);
-		}else{
-      simulator = new PajeSimulator (arguments.stopat, arguments.ignoreIncompleteLinks);
-
-      //connect components
-      if (arguments.flex){
-        reader->setOutputComponent (simulator);
-        simulator->setInputComponent (reader);
-      }else{
-        reader->setOutputComponent (decoder);
-        decoder->setInputComponent (reader);
-        decoder->setOutputComponent (simulator);
-        simulator->setInputComponent (decoder);
-      }
-    }
-  }catch (PajeException& e){
-    e.reportAndExit ();
-  }
-  //read and simulate
-  try {      
-    reader->startReading ();
-    while (reader->hasMoreData() && simulator->keepSimulating()){
-      std::vector<PajeContainer*> stack;
-      stack.push_back (simulator->rootInstance());
-      //std::cout << stack.size ()<<" ";
-      reader->readNextChunk ();
-    }
-    reader->finishedReading ();
-  }catch (PajeException& e){
-    e.reportAndExit();
-  }
-
-  if (!arguments.quiet){
-    dump (&arguments, simulator);
-  }
-
-  delete reader;
-  if (!arguments.flex && !arguments.rastroReader){
-    delete decoder;
-  }
-  //delete decoder;
-  delete simulator;
-  delete definitions;
-  return 0;
-*/
 }

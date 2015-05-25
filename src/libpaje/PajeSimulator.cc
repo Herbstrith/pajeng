@@ -1139,7 +1139,6 @@ void PajeSimulator::pajeAddVariable (PajeTraceEvent *traceEvent)
     throw PajeTypeException ("Type '"+ctype1.str()+"' is not child type of container type '"+ctype2.str()+"' in "+eventdesc.str());
   }
 
-  
   if(!useRastroEvent){
     v = strtof (value.c_str(), NULL);
     PajeAddVariableEvent event (traceEvent, container, type, v);
@@ -1208,7 +1207,6 @@ void PajeSimulator::pajeSubVariable (PajeTraceEvent *traceEvent)
     ctype2 << *container->type();
     throw PajeTypeException ("Type '"+ctype1.str()+"' is not child type of container type '"+ctype2.str()+"' in "+eventdesc.str());
   }
-
 
   if(!useRastroEvent){
     v = strtof (value.c_str(), NULL);
@@ -1313,8 +1311,6 @@ void PajeSimulator::pajeStartLink (PajeTraceEvent *traceEvent)
     val = type->addValue (value, value, NULL);
   }
   
-  
-  
   if(!useRastroEvent){
     v = strtof (value.c_str(), NULL);
     PajeStartLinkEvent event (traceEvent, container, type, val, startcontainer, key);
@@ -1324,7 +1320,6 @@ void PajeSimulator::pajeStartLink (PajeTraceEvent *traceEvent)
     container->demuxer (&event);
   }
   
-
 }
 
 void PajeSimulator::pajeEndLink (PajeTraceEvent *traceEvent)
@@ -1425,7 +1420,6 @@ void PajeSimulator::pajeEndLink (PajeTraceEvent *traceEvent)
     container->demuxer (&event);
   }
   
-
 }
 
 void PajeSimulator::pajeTraceFile (PajeTraceEvent *traceEvent)

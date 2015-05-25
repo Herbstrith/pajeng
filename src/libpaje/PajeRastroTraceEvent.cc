@@ -24,12 +24,10 @@ PajeRastroTraceEvent::PajeRastroTraceEvent ()
 PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event)
 {
   pajeEventDefinition = def;
-  
   paje_field = &def->paje_field;
- 
   memcpy(definitionOrder, def->definitionOrder, sizeof(def->definitionOrder));
-
   pajeEventDefinition = def;
+  
   if(def->int_mark > 0){
     memcpy(v_uint32 , event->v_uint32,sizeof(event->v_uint32));
   }
@@ -39,7 +37,6 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
   if(def->double_mark > 0){
     memcpy(v_double , event->v_double,sizeof(event->v_double));  
   }
-  
 }
 
 PajeRastroTraceEvent::~PajeRastroTraceEvent ()
@@ -47,7 +44,6 @@ PajeRastroTraceEvent::~PajeRastroTraceEvent ()
   str_fields.clear();
   double_fields.clear();
   int_fields.clear();
-
 }
 
 PajeEventId PajeRastroTraceEvent::pajeEventId (void)
@@ -79,7 +75,7 @@ void PajeRastroTraceEvent::clear (void)
   free(v_double);
 }
 
-/*
+/*TODO: recheck this whole part
 bool PajeRastroTraceEvent::check (paje_line *line)
 {
   if (!pajeEventDefinition) return false;
@@ -145,7 +141,6 @@ std::string PajeRastroTraceEvent::valueForExtraField (std::string fieldName)
 {
   return NULL;
 }
-
 
 std::string PajeRastroTraceEvent::description (void) const
 {

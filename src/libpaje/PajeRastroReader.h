@@ -35,9 +35,7 @@
 extern "C"
 {
   #include <rastro.h>
-
 }
-
 
 class PajeRastroReader : public PajeComponent {
 private:
@@ -45,7 +43,7 @@ private:
   PajeEventDefinition *eventBeingDefined;
   std::map<u_int32_t,PajeEventDefinition*> eventDefinitions;
   rst_rastro_t rastro;
-   rst_event_t rst_event;
+  rst_event_t rst_event;
   bool moreData;
   void scanDefinitionLine(u_int32_t definitionArray[], u_int32_t size);
   PajeRastroTraceEvent *scanEventLine (rst_event_t *event);

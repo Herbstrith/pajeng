@@ -34,8 +34,7 @@ PajeRastroReader::PajeRastroReader (PajeDefinitions *definitions, char *file_rst
   int status = rst_open_file (&rastro, 10000000,
                               file_rst,
                               (char*)"out.txt");
-                             
-                              
+                                                  
   if (status == RST_NOK){
     //TODO: throw Exception
     printf("error at openning of the rst_file\n");
@@ -59,12 +58,9 @@ void PajeRastroReader::scanDefinitionLine(u_int32_t definitionArray[], u_int32_t
   eventBeingDefined = new PajeEventDefinition((PajeEventId)(definitionArray[0]),(int)(definitionArray[0]), currentEvent,defs);
  
   for (; n < size; n=n+2) {
-    eventBeingDefined->addField((PajeField)(definitionArray[n]),(PajeFieldType)(definitionArray[n+1]),0);
-    
+    eventBeingDefined->addField((PajeField)(definitionArray[n]),(PajeFieldType)(definitionArray[n+1]),0); 
   }
-  
-  
-  
+
   eventDefinitions[(int)(definitionArray[0])] = eventBeingDefined;
 }
 
@@ -78,7 +74,6 @@ PajeRastroTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
   std::map<u_int32_t,PajeEventDefinition*>::iterator it;
   it = eventDefinitions.find(eventId);
   eventDefinition =  it->second;
-  
 
   if (eventDefinition == NULL) { 
     throw PajeDecodeException ("Event with id '"+std::string("%d",eventId)+"' has not been defined");
@@ -91,9 +86,6 @@ bool PajeRastroReader::hasMoreData()
 {
   return moreData;
 }
-
-
-
 
 //called by the PajeThreadReader
 void PajeRastroReader::readNextChunk ()
@@ -119,7 +111,6 @@ void PajeRastroReader::readNextChunk ()
   }else{
     moreData = false;
   }
-
 
 }
 

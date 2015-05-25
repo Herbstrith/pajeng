@@ -34,7 +34,6 @@
 extern "C"
 {
   #include <rastro.h>
-
 }
 union T
 {
@@ -54,14 +53,13 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
   //u_int64_t v_uint64[RST_MAX_FIELDS_PER_TYPE];
   //float v_float[RST_MAX_FIELDS_PER_TYPE];
   double v_double[RST_MAX_FIELDS_PER_TYPE];
-
   std::vector<char*>str_fields;
   std::vector<double> double_fields;
-  std::vector<int> int_fields;
-  
+  std::vector<int> int_fields; 
   int fieldOrder[10];
   int definitionOrder[10];
   std::map <PajeField, int> *paje_field;
+  
  public:
   PajeRastroTraceEvent ();
   PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event);
@@ -79,9 +77,7 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
   void setDefinition (PajeEventDefinition *def);
 
   char* valueForStringField(PajeField field);
-
   int valueForIntField(PajeField field);
-
   double valueForDoubleField(PajeField field);
 
 };
