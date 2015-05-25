@@ -17,7 +17,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.8)
 #cmake_policy(SET CMP0050 OLD)
 PROJECT(pajeng)
 # The following line should be deleted in some Ubuntu releases
-cmake_policy(SET CMP0050 OLD)
+#cmake_policy(SET CMP0050 OLD)
 enable_testing()
 
 
@@ -30,6 +30,10 @@ OPTION(PAJE_UTILS_LIBRARY "The Paje Utils library with QT-dependent components" 
 OPTION(PAJE_LIBRARY "The Paje library with all the basic components" ON)
 OPTION(PAJE_TOOLS     "Compile auxiliary tools (pj_dump, etc)" ON)
 OPTION(STATIC_LINKING "Static linking of auxiliary tools" OFF)
+OPTION(RASTRO_READER "Use a .rst file as input" ON)
+IF(RASTRO_READER)
+    ADD_DEFINITIONS(-DRASTRO_READER)
+ENDIF(RASTRO_READER)
 
 add_subdirectory(src)
 add_subdirectory(doc)

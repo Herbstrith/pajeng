@@ -73,7 +73,7 @@ PajeUnity::PajeUnity (bool flexReader, bool rastroReader, bool strictHeader, std
       simulator->setInputComponent (reader);
     }else if(rastroReader){
       //call the constructor for the Rastro PajeSimulator
-      simulator = new PajeSimulator (true);
+      simulator = new PajeSimulator ();
 			reader->setOutputComponent (simulator);
       simulator->setInputComponent (reader);
     }else{
