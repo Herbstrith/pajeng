@@ -43,7 +43,6 @@ SET(LIBPAJE_HEADERS
   PajeDefinitions.h
   PajeFlexReader.h
   PajeUnity.h
-  PajeBinaryReader.h
   PajeRastroTraceEvent.h
   PajeRastroReader.h
 )
@@ -71,7 +70,6 @@ SET(LIBPAJE_SOURCES
   ${BISON_parser_OUTPUTS}
   PajeFlexReader.cc
   PajeUnity.cc
-  PajeBinaryReader.cc
   PajeRastroTraceEvent.cc
   PajeRastroReader.cc
 )
