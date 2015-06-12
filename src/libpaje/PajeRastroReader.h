@@ -46,9 +46,17 @@ private:
   rst_event_t rst_event;
   bool moreData;
   void scanDefinitionLine(u_int32_t definitionArray[], u_int32_t size);
-  PajeRastroTraceEvent *scanEventLine (rst_event_t *event);
+  PajeRastroTraceEvent* scanEventLine (rst_event_t *event);
+  void AddToParamList(rst_event_t *reference);
   long long currentEvent;
   PajeDefinitions *defs;
+
+  struct StringParamsList{
+    char* string;
+    short string_position;
+    struct  StringParamsList* next;
+  };
+  StringParamsList *stringList;
 
 public:
   PajeRastroReader (PajeDefinitions *definitions, char *file_rst);

@@ -35,12 +35,7 @@ extern "C"
 {
   #include <rastro.h>
 }
-union T
-{
-    int i;
-    char *s;
-    double d;
-};
+
 
 class PajeRastroTraceEvent : public PajeTraceEvent {
  private:
@@ -70,7 +65,6 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
   void addField (int field);
   void clear (void);
   bool check (paje_line *line);
-  //T valueForField (PajeField field);
   std::string valueForExtraField (std::string fieldName);
   std::string description (void) const;
   PajeEventDefinition *definition (void);

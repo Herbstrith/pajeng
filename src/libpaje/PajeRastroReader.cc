@@ -19,7 +19,6 @@
 #include "PajeRastroTraceEvent.h"
 #include "PajeDefinitions.h"
 #include <stdlib.h>
-
 PajeRastroReader::PajeRastroReader (PajeDefinitions *definitions, char *file_rst)
 {
 
@@ -99,18 +98,60 @@ void PajeRastroReader::readNextChunk ()
     }
     //event definition
     else{
-      PajeRastroTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
-      
-      if (event != NULL){
-        PajeComponent::outputEntity(event);
-        currentEvent++;
-      }
-      delete event;
-       //printf("finished read event %d \n",currentEvent);
+      //if event is a reference load(either save the events right before they are used or have a separated file with the strings)
+      if(rst_event.type = 888)
+      {
+        AddToParamList(&rst_event);
+      }else{            
+        PajeRastroTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
+        
+        if (event != NULL){
+          PajeComponent::outputEntity(event);
+          currentEvent++;
+        }
+        delete event;
+      }    
     }
   }else{
     moreData = false;
   }
 
 }
+
+
+char* PajeRastroReader::FindStringParam(short position)
+{
+  struct StringParamsList *actual = stringList;  
+  short counter =0;
+  while(actual <= position){
+      actual = actual->next;
+      counter = counter + 1;
+  }
+  return actual->string;
+}
+
+
+void PajeRastroReader::AddToParamList(rst_event_t *reference);
+{
+
+  if(stringList == NULL){
+    stringList = (struct StringParamsList *)malloc(sizeof(struct StringParamsList));
+    stringList->string = event->v_string[0];
+    stringList->string_position = event->v_uint16[0];
+    stringList->next = NULL;
+    return;
+  }
+
+  StringParamsList *actual = stringList;  
+  while(actual != NULL){
+    if(actual->next == NULL) break;
+    actual = actual->next;
+  }
+  struct StringParamsList *new_param = (struct StringParamsList *)malloc(sizeof(struct StringParamsList));
+  new_param->string = event->v_string[0];
+  new_param->string_position = event->v_uint16[0];
+  new_param->next = NULL;
+  actual->next = new_param;
+}
+
 
