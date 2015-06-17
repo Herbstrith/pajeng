@@ -28,9 +28,6 @@
 #include "PajeEventDefinition.h"
 #include "PajeObject.h"
 
-//#define RST_MAX_FIELDS_PER_TYPE  10
-//#define   RST_MAX_STRLEN 120
-
 extern "C"
 {
   #include <rastro.h>
@@ -41,6 +38,7 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
  private:
   PajeEventDefinition *pajeEventDefinition;
   
+  char **v_string_ref;  
   char v_string[RST_MAX_FIELDS_PER_TYPE][RST_MAX_STRLEN];
   //u_int8_t v_uint8[RST_MAX_FIELDS_PER_TYPE];
   //u_int16_t v_uint16[RST_MAX_FIELDS_PER_TYPE];
@@ -58,6 +56,7 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
  public:
   PajeRastroTraceEvent ();
   PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event);
+  PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event, char* str_refs[RST_MAX_FIELDS_PER_TYPE]);  
   ~PajeRastroTraceEvent ();
   PajeEventId pajeEventId (void);
   void addField (char *field);

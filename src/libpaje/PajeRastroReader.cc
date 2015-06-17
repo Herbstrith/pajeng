@@ -21,7 +21,6 @@
 #include <stdlib.h>
 PajeRastroReader::PajeRastroReader (PajeDefinitions *definitions, char *file_rst)
 {
-
   ReadStrings();  
   defStatus = OUT_DEF;
   currentEvent = 0;
@@ -67,6 +66,8 @@ void PajeRastroReader::scanDefinitionLine(u_int32_t definitionArray[], u_int32_t
 
 PajeRastroTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
 {
+  char** strings_ref;
+  strings_ref = (char**)malloc((sizeof(char*)*15)*sizeof(char*)*100);
   int eventId = -1;
   PajeEventDefinition *eventDefinition = NULL;
   eventId = event->type;
@@ -79,11 +80,12 @@ PajeRastroTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
   }
   if (event->ct.n_uint8 > 0) {
     for (int i = 0; i < event->ct.n_uint8; i++) {
-      strcpy(event->v_string[i],FindStringParam(event->v_uint8[i]));
+       strings_ref[i] = FindStringParam(event->v_uint8[i]);;
+      //strcpy(event->v_string[i],FindStringParam(event->v_uint8[i]));
     }
   }
-  
-  return new PajeRastroTraceEvent (eventDefinition,event); 
+  return new PajeRastroTraceEvent (eventDefinition,event,strings_ref);
+  //return new PajeRastroTraceEvent (eventDefinition,event);
 }
 
 bool PajeRastroReader::hasMoreData()
@@ -94,6 +96,7 @@ bool PajeRastroReader::hasMoreData()
 //called by the PajeThreadReader
 void PajeRastroReader::readNextChunk ()
 {
+
   /* reading the file */
   if(rst_decode_event(&rastro, &rst_event)){
     int PajeHeaderEventId = 999;
@@ -109,7 +112,6 @@ void PajeRastroReader::readNextChunk ()
         //AddToParamList(&rst_event);
       }else{ 
         PajeRastroTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
-        
         if (event != NULL){
           PajeComponent::outputEntity(event);
           currentEvent++;
@@ -125,7 +127,6 @@ void PajeRastroReader::readNextChunk ()
 
 void PajeRastroReader::ReadStrings()
 {
-
   rst_rastro_t rastro_strings;
   bzero(&rastro_strings, sizeof(rst_rastro_t));
   rst_event_t event_strings;
@@ -186,10 +187,8 @@ void PajeRastroReader::ReadStrings()
 char* PajeRastroReader::FindStringParam(short position)
 {
   struct StringParamsList *actual = stringList;  
-  short counter =0;
   while(actual->string_position < position){
       actual = actual->next;
-      counter = counter + 1;
   }
   return actual->string;
 }
