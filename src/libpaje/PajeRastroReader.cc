@@ -24,7 +24,6 @@ PajeRastroReader::PajeRastroReader (PajeDefinitions *definitions, char *file_rst
   ReadStrings();  
   defStatus = OUT_DEF;
   currentEvent = 0;
-
   moreData = true;
   defs  = definitions;
 
@@ -48,7 +47,6 @@ PajeRastroReader::~PajeRastroReader ()
   rst_close (&rastro);
 }
 
-
 //we'll try saving the fields position here so we dont have to do it for every event scan
 void PajeRastroReader::scanDefinitionLine(u_int32_t definitionArray[], u_int32_t size)
 {                           
@@ -66,12 +64,10 @@ void PajeRastroReader::scanDefinitionLine(u_int32_t definitionArray[], u_int32_t
 
 PajeRastroTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
 {
-  char** strings_ref;
-  strings_ref = (char**)malloc((sizeof(char*)*15)*sizeof(char*)*100);
+  std::vector<char*>strings_ref;
   int eventId = -1;
   PajeEventDefinition *eventDefinition = NULL;
   eventId = event->type;
-
   std::map<u_int32_t,PajeEventDefinition*>::iterator it;
   it = eventDefinitions.find(eventId);
   eventDefinition =  it->second;
@@ -79,13 +75,10 @@ PajeRastroTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
     throw PajeDecodeException ("Event with id '"+std::string("%d",eventId)+"' has not been defined");
   }
   if (event->ct.n_uint8 > 0) {
-    for (int i = 0; i < event->ct.n_uint8; i++) {
-       strings_ref[i] = FindStringParam(event->v_uint8[i]);;
-      //strcpy(event->v_string[i],FindStringParam(event->v_uint8[i]));
-    }
+    for (int i = 0; i < event->ct.n_uint8; i++) 
+       strings_ref.push_back(stringList[event->v_uint8[i]]);
   }
   return new PajeRastroTraceEvent (eventDefinition,event,strings_ref);
-  //return new PajeRastroTraceEvent (eventDefinition,event);
 }
 
 bool PajeRastroReader::hasMoreData()
@@ -96,7 +89,6 @@ bool PajeRastroReader::hasMoreData()
 //called by the PajeThreadReader
 void PajeRastroReader::readNextChunk ()
 {
-
   /* reading the file */
   if(rst_decode_event(&rastro, &rst_event)){
     int PajeHeaderEventId = 999;
@@ -109,7 +101,7 @@ void PajeRastroReader::readNextChunk ()
       //if event is a reference load(either save the events right before they are used or have a separated file with the strings)
       if(rst_event.type == 888)
       {
-        //AddToParamList(&rst_event);
+        //later
       }else{ 
         PajeRastroTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
         if (event != NULL){
@@ -133,87 +125,25 @@ void PajeRastroReader::ReadStrings()
   int i;
 
   /* open rst file */
-    int status = rst_open_file (&rastro_strings, 100000,
-                                "strings_reference.rst",
-                                (char*)"out.txt");
-    if (status == RST_NOK){
-      fprintf(stderr,
-              "[rastro_read] at %s, "
-              "trace file %s could not be opened\n",
-              __FUNCTION__, "strings_reference.rst");
-      return;
+  int status = rst_open_file (&rastro_strings, 100000,
+                              "strings_reference.rst",
+                              (char*)"out.txt");
+  if (status == RST_NOK){
+    fprintf(stderr,
+            "[rastro_read] at %s, "
+            "trace file %s could not be opened\n",
+            __FUNCTION__, "strings_reference.rst");
+    return;
   }
   
-  
-  /* reading all the files */
+  /* reading all the strings */
   while (rst_decode_event (&rastro_strings, &event_strings)) {
-    if(stringList == NULL){
-      stringList =(StringParamsList*) malloc(sizeof(StringParamsList));
-     // memcpy(stringList->string , &(event_strings.v_string[0]),sizeof(&(event_strings.v_string[0]))); 
-      stringList->string = strdup(event_strings.v_string[0]);
-      stringList->string_position = event_strings.v_uint8[0];
-      stringList->next = NULL;
-      continue;
-    }  
-    StringParamsList *actual = stringList;  
-    while(actual != NULL){
-        if(actual->next == NULL)
-        {
-          break;
-        }
-        actual = actual->next;
-    }
-    
-    StringParamsList *new_param = (StringParamsList *)malloc(sizeof(StringParamsList));
-    //memcpy(new_param->string , event_strings.v_string[0],sizeof(event_strings.v_string[0])); 
-    new_param->string = strdup(event_strings.v_string[0]);
-    new_param->string_position = event_strings.v_uint8[0];
-    new_param->next = NULL;
-    actual->next = new_param;
+     stringList.push_back(strdup(event_strings.v_string[0]));
   }
-  
 
   /* closing everything */
   rst_close (&rastro_strings);
-
-  /*printf("printings strings \n");
-  StringParamsList *actual = stringList;
-  while(actual != NULL){
-        printf("\n %d  -- %s \n", actual->string_position, actual->string);
-        actual = actual->next;
-    }*/
 }
 
-char* PajeRastroReader::FindStringParam(short position)
-{
-  struct StringParamsList *actual = stringList;  
-  while(actual->string_position < position){
-      actual = actual->next;
-  }
-  return actual->string;
-}
-/*
-void PajeRastroReader::AddToParamList(rst_event_t *reference);
-{
-
-  if(stringList == NULL){
-    stringList = (struct StringParamsList *)malloc(sizeof(struct StringParamsList));
-    stringList->string = event->v_string[0];
-    stringList->string_position = event->v_uint16[0];
-    stringList->next = NULL;
-    return;
-  }
-
-  StringParamsList *actual = stringList;  
-  while(actual != NULL){
-    if(actual->next == NULL) break;
-    actual = actual->next;
-  }
-  struct StringParamsList *new_param = (struct StringParamsList *)malloc(sizeof(struct StringParamsList));
-  new_param->string = event->v_string[0];
-  new_param->string_position = event->v_uint16[0];
-  new_param->next = NULL;
-  actual->next = new_param;
-}*/
 
 
