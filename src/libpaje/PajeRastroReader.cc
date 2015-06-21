@@ -74,10 +74,12 @@ PajeRastroTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
   if (eventDefinition == NULL) { 
     throw PajeDecodeException ("Event with id '"+std::string("%d",eventId)+"' has not been defined");
   }
-  if (event->ct.n_uint8 > 0) {
-    for (int i = 0; i < event->ct.n_uint8; i++) 
-       strings_ref.push_back(stringList[event->v_uint8[i]]);
+  if (event->ct.n_uint16 > 0) {
+    for (int i = 0; i < event->ct.n_uint16; i++){ 
+       strings_ref.push_back(stringList[event->v_uint16[i]]);
+     }
   }
+   
   return new PajeRastroTraceEvent (eventDefinition,event,strings_ref);
 }
 
@@ -92,6 +94,7 @@ void PajeRastroReader::readNextChunk ()
   /* reading the file */
   if(rst_decode_event(&rastro, &rst_event)){
     int PajeHeaderEventId = 999;
+    int StringRefenceId = 888;
     //header definition
     if(rst_event.type == PajeHeaderEventId ){
       PajeRastroReader::scanDefinitionLine(rst_event.v_uint32,rst_event.ct.n_uint32);   
@@ -99,9 +102,8 @@ void PajeRastroReader::readNextChunk ()
     //event definition
     else{
       //if event is a reference load(either save the events right before they are used or have a separated file with the strings)
-      if(rst_event.type == 888)
-      {
-        //later
+      if(rst_event.type == StringRefenceId){     
+        stringList.push_back(strdup(rst_event.v_string[0]));
       }else{ 
         PajeRastroTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
         if (event != NULL){

@@ -221,7 +221,6 @@ void PajeSimulator::pajeDefineContainerType (PajeTraceEvent *event)
     std::string alias = RastrotraceEvent->valueForStringField (PAJE_Alias);
   #endif
   
-  //std::cout <<"alias " << alias <<" and tuype" << type << "\n";
   //search for parent type
   PajeType *containerType = typeMap[type];
 
