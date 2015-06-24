@@ -46,13 +46,14 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
  private:
   PajeEventDefinition *pajeEventDefinition;
   
-  char v_string[RST_MAX_FIELDS_PER_TYPE][RST_MAX_STRLEN];
+  rst_event_t *rastro_event;
+  //char v_string[RST_MAX_FIELDS_PER_TYPE][RST_MAX_STRLEN];
   //u_int8_t v_uint8[RST_MAX_FIELDS_PER_TYPE];
   //u_int16_t v_uint16[RST_MAX_FIELDS_PER_TYPE];
-  u_int32_t v_uint32[RST_MAX_FIELDS_PER_TYPE];
+  //u_int32_t v_uint32[RST_MAX_FIELDS_PER_TYPE];
   //u_int64_t v_uint64[RST_MAX_FIELDS_PER_TYPE];
   //float v_float[RST_MAX_FIELDS_PER_TYPE];
-  double v_double[RST_MAX_FIELDS_PER_TYPE];
+  //double v_double[RST_MAX_FIELDS_PER_TYPE];
   std::vector<char*>str_fields;
   std::vector<double> double_fields;
   std::vector<int> int_fields; 

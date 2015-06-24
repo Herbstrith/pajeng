@@ -28,7 +28,9 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
   memcpy(definitionOrder, def->definitionOrder, sizeof(def->definitionOrder));
   pajeEventDefinition = def;
   
-  if(def->int_mark > 0){
+  memcpy(rastro_event,event,sizeof(&event));
+
+  /*if(def->int_mark > 0){
     memcpy(v_uint32 , event->v_uint32,sizeof(event->v_uint32));
   }
   if(def->string_mark > 0){
@@ -36,7 +38,7 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
   }
   if(def->double_mark > 0){
     memcpy(v_double , event->v_double,sizeof(event->v_double));  
-  }
+  }*/
 }
 
 PajeRastroTraceEvent::~PajeRastroTraceEvent ()
@@ -70,9 +72,10 @@ void PajeRastroTraceEvent::clear (void)
   str_fields.clear();
   double_fields.clear();
   int_fields.clear();
-  free(v_uint32);
+  /*free(v_uint32);
   free(v_string);
-  free(v_double);
+  free(v_double);*/
+  free(rastro_event);
 }
 
 /*TODO: recheck this whole part
@@ -120,20 +123,20 @@ T PajeRastroTraceEvent::valueForField (PajeField field)
 char* PajeRastroTraceEvent::valueForStringField(PajeField field)
 {
   char* value = "-1";  
-  value = v_string[(*paje_field)[field]];
+  value = rastro_event->v_string[(*paje_field)[field]];
   return value;
 }
 
 int PajeRastroTraceEvent::valueForIntField(PajeField field)
 {
   int value;
-  value = v_uint32[(*paje_field)[field]];
+  value = rastro_event->v_uint32[(*paje_field)[field]];
   return value;
 }
 double PajeRastroTraceEvent::valueForDoubleField(PajeField field)
 {
   double value;
-  value = v_double[(*paje_field)[field]];
+  value = rastro_event->v_double[(*paje_field)[field]];
   return value;
 }
 
@@ -146,7 +149,7 @@ std::string PajeRastroTraceEvent::description (void) const
 {
   std::stringstream output;
   unsigned int i;
-  int field_count = sizeof(v_string)/sizeof(*v_string) + sizeof(v_double)/sizeof(*v_double) + sizeof(v_uint32)/sizeof(*v_uint32);
+  int field_count = sizeof(rastro_event->v_string)/sizeof(*rastro_event->v_string) + sizeof(rastro_event->v_double)/sizeof(*rastro_event->v_double) + sizeof(rastro_event->v_uint32)/sizeof(*rastro_event->v_uint32);
   output << ", Fields: '" << field_count;
   output << ", Contents: '";
 
@@ -154,17 +157,17 @@ std::string PajeRastroTraceEvent::description (void) const
   for (int def_order =0, i = 0; i < field_count ; i++,def_order++){
 	if(definitionOrder[def_order] == PAJE_string ||definitionOrder[def_order] == PAJE_color)
   {
-		output << v_string[string_mark];
+		output << rastro_event->v_string[string_mark];
     string_mark++;
   }	
   if(definitionOrder[def_order] == PAJE_double || definitionOrder[def_order] == PAJE_date)
   {	
-	  output << v_double[double_mark];
+	  output << rastro_event->v_double[double_mark];
     double_mark++;
   }	
   if(definitionOrder[def_order] == PAJE_int )
   {		
-    output << v_uint32[int_mark];
+    output << rastro_event->v_uint32[int_mark];
     int_mark++;
   }    
   
