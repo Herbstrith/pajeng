@@ -22,7 +22,8 @@ PajeRastroTraceEvent::PajeRastroTraceEvent ()
 }
 
 PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event)
-{
+{  
+  useRastroRef = false;
   pajeEventDefinition = def;
   paje_field = &def->paje_field;
   memcpy(definitionOrder, def->definitionOrder, sizeof(def->definitionOrder));
@@ -41,6 +42,7 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
 
 PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event,std::vector<char*> str_refs)
 {
+  useRastroRef = true;
   v_string_ref = str_refs;  
   pajeEventDefinition = def;
   paje_field = &def->paje_field;
@@ -58,9 +60,6 @@ PajeRastroTraceEvent::PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t
 
 PajeRastroTraceEvent::~PajeRastroTraceEvent ()
 {
-  str_fields.clear();
-  double_fields.clear();
-  int_fields.clear();
   v_string_ref.clear();
 }
 
@@ -69,25 +68,10 @@ PajeEventId PajeRastroTraceEvent::pajeEventId (void)
   return pajeEventDefinition->pajeEventIdentifier;
 }
 
-void PajeRastroTraceEvent::addField (char *field)
-{
-  str_fields.push_back (field);
-}
-void PajeRastroTraceEvent::addField (double field)
-{
-  double_fields.push_back (field);
-}
-void PajeRastroTraceEvent::addField (int field)
-{
-  int_fields.push_back (field);
-}
 
 void PajeRastroTraceEvent::clear (void)
 {
   pajeEventDefinition = NULL;
-  str_fields.clear();
-  double_fields.clear();
-  int_fields.clear();
   free(v_uint32);
   free(v_string);
   free(v_double);
@@ -139,7 +123,10 @@ T PajeRastroTraceEvent::valueForField (PajeField field)
 char* PajeRastroTraceEvent::valueForStringField(PajeField field)
 {
   char* value = NULL;  
-  value = v_string_ref[(*paje_field)[field]];
+  if(useRastroRef)
+    value = v_string_ref[(*paje_field)[field]];
+  else 
+    value = v_string[(*paje_field)[field]];
   return value;
 }
 

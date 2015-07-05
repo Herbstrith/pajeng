@@ -33,6 +33,7 @@ static struct argp_option options[] = {
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
   {"version", 'v', 0, OPTION_ARG_OPTIONAL, "Print version of this binary"},
   {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
+  {"rastro", 'x', 0, OPTION_ARG_OPTIONAL, "Use a rst file generated with strings references as input"},
   { 0 }
 };
 
@@ -55,6 +56,7 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 'q': arguments->quiet = 1; break;
   case 'f': arguments->flex = 1; break;
   case 'r': arguments->rastroReader = 1;break;
+  case 'x': arguments->rastroReader = 2;break;
   case 'v': printf("%s\n", LIBPAJE_VERSION_STRING); exit(0); break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {

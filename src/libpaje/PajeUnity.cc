@@ -29,7 +29,7 @@ static double gettime (void)
   return (double)tr.tv_sec+(double)tr.tv_usec/1000000;
 }
 
-PajeUnity::PajeUnity (bool flexReader, bool rastroReader, bool strictHeader, std::string tracefilename, double stopat, int ignoreIncompleteLinks, char *probabilistic)
+PajeUnity::PajeUnity (bool flexReader, int rastroReader, bool strictHeader, std::string tracefilename, double stopat, int ignoreIncompleteLinks, char *probabilistic)
 {
   //basic configuration
   this->flexReader = flexReader;
@@ -47,7 +47,7 @@ PajeUnity::PajeUnity (bool flexReader, bool rastroReader, bool strictHeader, std
       }
     }else if(rastroReader){
       char *cstr = &tracefilename[0u];
-      reader = new PajeRastroReader(definitions, cstr); 
+      reader = (rastroReader == 1) ? new PajeRastroReader(definitions, cstr) :  new PajeRastroReader(definitions, cstr, true);
     }else{
       if (tracefilename.empty()){
 	reader = new PajeFileReader();

@@ -51,11 +51,12 @@ private:
   long long currentEvent;
   std::vector<char*> stringList;
   char* FindStringParam(short position);
-
+  bool useRastroRef;
   PajeDefinitions *defs;
   
 public:
   PajeRastroReader (PajeDefinitions *definitions, char *file_rst);
+  PajeRastroReader (PajeDefinitions *definitions, char *file_rst, bool isRastroRefFile);
   ~PajeRastroReader (void);
   
   bool hasMoreData (void);

@@ -42,12 +42,10 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
   char v_string[RST_MAX_FIELDS_PER_TYPE][RST_MAX_STRLEN];
   u_int32_t v_uint32[RST_MAX_FIELDS_PER_TYPE];
   double v_double[RST_MAX_FIELDS_PER_TYPE];
-  std::vector<char*>str_fields;
-  std::vector<double> double_fields;
-  std::vector<int> int_fields; 
   int fieldOrder[10];
   int definitionOrder[10];
   std::map <PajeField, int> *paje_field;
+  bool useRastroRef;
   
  public:
   PajeRastroTraceEvent ();
@@ -55,9 +53,6 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
   PajeRastroTraceEvent (PajeEventDefinition *def,rst_event_t *event,std::vector<char*> str_refs);
   ~PajeRastroTraceEvent ();
   PajeEventId pajeEventId (void);
-  void addField (char *field);
-  void addField (double field);
-  void addField (int field);
   void clear (void);
   bool check (paje_line *line);
   std::string valueForExtraField (std::string fieldName);
