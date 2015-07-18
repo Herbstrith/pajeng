@@ -78,75 +78,24 @@ void PajeRastroTraceEvent::clear (void)
   v_string_ref.clear();
 }
 
-/*TODO: recheck this whole part
-bool PajeRastroTraceEvent::check (paje_line *line)
+
+bool PajeRastroTraceEvent::check (rst_event_t line)
 {
   if (!pajeEventDefinition) return false;
-  if ((str_fields.size() + double_fields.size() + int_fields.size()) != pajeEventDefinition->fieldCount()){
-    std::stringstream st;
-    if (line){
-      st << *line;
-    }else{
-      st << this->line;
-    }
-    std::string lreport = st.str();
-    std::cout << *pajeEventDefinition << std::endl;
-    std::cout << "Line field count: " << str_fields.size() + double_fields.size() + int_fields.size() << std::endl;
+  if ((sizeof(v_string)/sizeof(*v_string) + sizeof(v_double)/sizeof(*v_double) + sizeof(v_uint32)/sizeof(*v_uint32)) != pajeEventDefinition->fieldCount()){
+    rst_print_event (&line);
+    std::cout << "Line field count: " << sizeof(v_string)/sizeof(*v_string) + sizeof(v_double)/sizeof(*v_double) + sizeof(v_uint32)/sizeof(*v_uint32)<< std::endl;
     std::cout << "Definition field count: " << pajeEventDefinition->fieldCount() << std::endl;
-    std::cout << "Field count does not match definition for line "+lreport << std::endl;
+    std::cout << "Field count does not match definition for line "<< std::endl;
     return false;
   }else{
     return true;
   }
 }
-*/
-/*
-T PajeRastroTraceEvent::valueForField (PajeField field)
-{
-  T return_value;
-  return_value.i = -1;
-  return_value.d = -1;
-  return_value.s = "-1";
-  int index = pajeEventDefinition->indexForField (field);
-  if (index == -1){
-    return return_value;
-  }else{
-	int type = definitionOrder[index];
-	  
-	return_value.d = double_fields.at(index);
-	return_value.i = int_fields.at(index);
-	return_value.s = str_fields.at(index);
-    return return_value;
-  }
-}
-*/
-char* PajeRastroTraceEvent::valueForStringField(PajeField field)
-{
-  char* value = NULL;  
-  if(useRastroRef)
-    value = v_string_ref[(*paje_field)[field]];
-  else 
-    value = v_string[(*paje_field)[field]];
-  return value;
-}
 
-int PajeRastroTraceEvent::valueForIntField(PajeField field)
-{
-  int value;
-  value = v_uint32[(*paje_field)[field]];
-  return value;
-}
-double PajeRastroTraceEvent::valueForDoubleField(PajeField field)
-{
-  double value;
-  value = v_double[(*paje_field)[field]];
-  return value;
-}
 
-std::string PajeRastroTraceEvent::valueForExtraField (std::string fieldName)
-{
-  return NULL;
-}
+
+
 
 std::string PajeRastroTraceEvent::description (void) const
 {
@@ -195,3 +144,30 @@ std::ostream &operator<< (std::ostream &output, const PajeRastroTraceEvent &even
   output << event.description();
   return output;
 }
+
+
+char* PajeRastroTraceEvent::valueForStringField(PajeField field)
+{
+  char* value = NULL;  
+  if(useRastroRef)
+    value = v_string_ref[(*paje_field)[field]];
+  else 
+    value = v_string[(*paje_field)[field]];
+  return value;
+}
+
+int PajeRastroTraceEvent::valueForIntField(PajeField field)
+{
+  int value;
+  value = v_uint32[(*paje_field)[field]];
+  return value;
+}
+double PajeRastroTraceEvent::valueForDoubleField(PajeField field)
+{
+  double value;
+  value = v_double[(*paje_field)[field]];
+  return value;
+}
+
+
+

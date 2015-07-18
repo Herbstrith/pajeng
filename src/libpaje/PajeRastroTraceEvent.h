@@ -54,8 +54,7 @@ class PajeRastroTraceEvent : public PajeTraceEvent {
   ~PajeRastroTraceEvent ();
   PajeEventId pajeEventId (void);
   void clear (void);
-  bool check (paje_line *line);
-  std::string valueForExtraField (std::string fieldName);
+  bool check (rst_event_t line);
   std::string description (void) const;
   PajeEventDefinition *definition (void);
   void setDefinition (PajeEventDefinition *def);
