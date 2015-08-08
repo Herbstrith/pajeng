@@ -35,27 +35,7 @@ PajeRastroReader::PajeRastroReader (PajeDefinitions *definitions, char *file_rst
                               file_rst,
                               (char*)"out.txt");
                                                   
-  if (status == RST_NOK){
-    //TODO: throw Exception
-    printf("error at openning of the rst_file\n");
-  }
-
-}
-
-PajeRastroReader::PajeRastroReader (PajeDefinitions *definitions, char *file_rst, bool isRastroRefFile)
-{
-  defStatus = OUT_DEF;
-  currentEvent = 0;
-  moreData = true;
-  defs  = definitions;
-  useRastroRef = isRastroRefFile; 
-  bzero(&rastro, sizeof(rst_rastro_t));
-  //open rst_file
-  int status = rst_open_file (&rastro, 10000000,
-                              file_rst,
-                              (char*)"out.txt");
-                                                  
-  if (status == RST_NOK){
+  if (status == RST_NOK) {
     //TODO: throw Exception
     printf("error at openning of the rst_file\n");
   }
@@ -85,7 +65,7 @@ void PajeRastroReader::scanDefinitionLine(u_int32_t definitionArray[], u_int32_t
 
 
 PajeRastroTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
-{
+{    
   int eventId = -1;
   PajeEventDefinition *eventDefinition = NULL;
   eventId = event->type;
@@ -95,17 +75,15 @@ PajeRastroTraceEvent *PajeRastroReader::scanEventLine (rst_event_t *event)
   if (eventDefinition == NULL) { 
     throw PajeDecodeException ("Event with id '"+std::string("%d",eventId)+"' has not been defined");
   }
-  if(useRastroRef)
-  { 
+  if(useRastroRef) { 
     std::vector<char*>strings_ref;
     if (event->ct.n_uint16 > 0) {
-      for (int i = 0; i < event->ct.n_uint16; i++){ 
+      for (int i = 0; i < event->ct.n_uint16; i++) { 
          strings_ref.push_back(stringList[event->v_uint16[i]]);
        }
     }
-    
-    return new PajeRastroTraceEvent (eventDefinition,event,strings_ref);   
-
+      
+    return new PajeRastroTraceEvent (eventDefinition,event,strings_ref);
   }
   return new PajeRastroTraceEvent (eventDefinition,event);
   
@@ -130,50 +108,22 @@ void PajeRastroReader::readNextChunk ()
     //event definition
     else{
       //if event is a str reference to load
-      if(rst_event.type == StringRefenceId){   
+      if(rst_event.type == StringRefenceId){
+        useRastroRef = true; 
         stringList.push_back(strdup(rst_event.v_string[0]));
-      }else{ 
+      } else { 
         PajeRastroTraceEvent *event = PajeRastroReader::scanEventLine(&rst_event);
-        if (event != NULL){
+        if (event != NULL) {
           PajeComponent::outputEntity(event);
           currentEvent++;
         }
         delete event;
       }    
     }
-  }else{
+  } else {
     moreData = false;
   }
 
 }
-
-void PajeRastroReader::ReadStrings()
-{
-  rst_rastro_t rastro_strings;
-  bzero(&rastro_strings, sizeof(rst_rastro_t));
-  rst_event_t event_strings;
-  int i;
-
-  /* open rst file */
-  int status = rst_open_file (&rastro_strings, 100000,
-                              "strings_reference.rst",
-                              (char*)"out.txt");
-  if (status == RST_NOK){
-    fprintf(stderr,
-            "[rastro_read] at %s, "
-            "trace file %s could not be opened\n",
-            __FUNCTION__, "strings_reference.rst");
-    return;
-  }
-  
-  /* reading all the strings */
-  while (rst_decode_event (&rastro_strings, &event_strings)) {
-     stringList.push_back(strdup(event_strings.v_string[0]));
-  }
-
-  /* closing everything */
-  rst_close (&rastro_strings);
-}
-
 
 
