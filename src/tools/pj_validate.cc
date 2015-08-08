@@ -32,8 +32,6 @@ static struct argp_option options[] = {
   {"time", 't', 0, OPTION_ARG_OPTIONAL, "Print number of seconds to simulate input"},
   {"flex", 'f', 0, OPTION_ARG_OPTIONAL, "Use flex-based file reader"},
   {"version", 'v', 0, OPTION_ARG_OPTIONAL, "Print version of this binary"},
-  {"rastro", 'r', 0, OPTION_ARG_OPTIONAL, "Use a rst file as input"},
-  {"rastro", 'x', 0, OPTION_ARG_OPTIONAL, "Use a rst file generated with strings references as input"},
   { 0 }
 };
 
@@ -96,7 +94,6 @@ int main (int argc, char **argv)
   }
 
   PajeUnity *unity = new PajeUnity (arguments.flex,
-            arguments.rastroReader,
 				    !arguments.noStrict,
 				    std::string(arguments.input[0]),
 				      -1,

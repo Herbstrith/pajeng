@@ -32,7 +32,7 @@ private:
   double t1, t2;
 
 public:
-  PajeUnity (bool flexReader,int rastroReader, bool strictHeader, std::string tracefilename, double stopat, int ignoreIncompleteLinks, char *probabilistic);
+  PajeUnity (bool flexReader, bool strictHeader, std::string tracefilename, double stopat, int ignoreIncompleteLinks, char *probabilistic);
   ~PajeUnity ();
   double getTime ();
   void report ();
