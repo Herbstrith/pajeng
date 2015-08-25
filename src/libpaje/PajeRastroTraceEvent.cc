@@ -68,7 +68,6 @@ PajeEventId PajeRastroTraceEvent::pajeEventId (void)
   return pajeEventDefinition->pajeEventIdentifier;
 }
 
-
 void PajeRastroTraceEvent::clear (void)
 {
   pajeEventDefinition = NULL;
@@ -77,7 +76,6 @@ void PajeRastroTraceEvent::clear (void)
   free(v_double);
   v_string_ref.clear();
 }
-
 
 bool PajeRastroTraceEvent::check (rst_event_t line)
 {
@@ -92,10 +90,6 @@ bool PajeRastroTraceEvent::check (rst_event_t line)
     return true;
   }
 }
-
-
-
-
 
 std::string PajeRastroTraceEvent::description (void) const
 {
@@ -145,7 +139,6 @@ std::ostream &operator<< (std::ostream &output, const PajeRastroTraceEvent &even
   return output;
 }
 
-
 char* PajeRastroTraceEvent::valueForStringField(PajeField field)
 {
   char* value = NULL;  
@@ -168,6 +161,4 @@ double PajeRastroTraceEvent::valueForDoubleField(PajeField field)
   value = v_double[(*paje_field)[field]];
   return value;
 }
-
-
 

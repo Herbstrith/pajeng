@@ -43,6 +43,7 @@ SET(LIBPAJE_HEADERS
   PajeDefinitions.h
   PajeFlexReader.h
   PajeUnity.h
+  PajeEnum.h
   PajeRastroTraceEvent.h
   PajeRastroReader.h
 )
@@ -105,6 +106,7 @@ ELSE(STATIC_LINKING)
   CONFIGURE_FILE (libpaje.pc.cmake libpaje.pc @ONLY)
   INSTALL (FILES ${CMAKE_CURRENT_BINARY_DIR}/libpaje.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 ENDIF(STATIC_LINKING)
+
 #### VERSION CHECK
 
 ###############

@@ -97,9 +97,10 @@ PajeType *PajeEntity::type (void) const
   return _type;
 }
 
-std::string PajeEntity::name (void) const
+const std::string &PajeEntity::name (void) const
 {
-  return std::string();
+  static const std::string nullstr = std::string();
+  return nullstr;
 }
 
 bool PajeEntity::isContainedBy (PajeContainer *container) const
@@ -299,7 +300,7 @@ PajeNamedEntity::PajeNamedEntity (PajeContainer *container, PajeType *type, doub
   _name = name;
 }
 
-std::string PajeNamedEntity::name (void) const
+const std::string &PajeNamedEntity::name (void) const
 {
   return _name;
 }

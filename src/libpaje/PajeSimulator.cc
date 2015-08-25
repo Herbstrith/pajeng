@@ -19,7 +19,6 @@
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
 
-
 int ignoreIncompleteLinks = 0;
 
 PajeSimulator::PajeSimulator ()
@@ -97,6 +96,26 @@ void PajeSimulator::report (void)
         stack.push_back (x);
         children.pop_back();
       }
+    }
+  }
+}
+
+void PajeSimulator::reportContainer (void)
+{
+  std::vector<PajeContainer*> stack;
+  stack.push_back (rootInstance());
+  while (!stack.empty()){
+    PajeContainer *last = stack.back();
+    stack.pop_back();
+
+    std::string name = last->name();
+    printf ("%s |%*.*s%s (%s)\n", __FUNCTION__, last->type()->depth(), last->type()->depth(), "| ", last->name().c_str(), name.c_str());
+
+    //push back more containers
+    std::vector<PajeContainer*> children = this->enumeratorOfContainersInContainer(last);
+    while (!children.empty()){
+      stack.push_back(children.back());
+      children.pop_back();
     }
   }
 }
@@ -221,9 +240,17 @@ void PajeSimulator::pajeDefineContainerType (PajeTraceEvent *event)
     std::string alias = RastrotraceEvent->valueForStringField (PAJE_Alias);
   #endif
   
+  //first, check if the name is allowed (it should be
+  //anything but "0" (the zero character)
+  if (name == "0"){
+    std::stringstream line;
+    line << *event;
+    throw PajeTypeException ("The type name '0' is reserved and should not be used in "+line.str());
+  }
+
+
   //search for parent type
   PajeType *containerType = typeMap[type];
-
   if (!containerType){
     std::stringstream line;
     line << *event;
@@ -476,6 +503,15 @@ void PajeSimulator::pajeCreateContainer (PajeTraceEvent *traceEvent)
     std::string alias = RastrotraceEvent->valueForStringField (PAJE_Alias);    
   #endif
 
+  //first, check if the name is allowed (it should be
+  //anything but "0" (the zero character)
+  std::string identifier_check = !alias.empty() ? alias : name;
+  if (identifier_check == "0" && contMap.size() > 1){
+    std::stringstream line;
+    line << *traceEvent;
+    throw PajeTypeException ("The container name '0' is reserved and should not be used in "+line.str());
+  }
+
   //search the container type for the new container
   PajeType *type = typeMap[typestr];
   if (!type){
@@ -490,7 +526,7 @@ void PajeSimulator::pajeCreateContainer (PajeTraceEvent *traceEvent)
     throw PajeTypeException ("Not a container type '"+typestr+"' in "+line.str());
   }
 
-  //search the container of the new container  
+  //search the container of the new container
   PajeContainer *container = contMap[containerid];
   if (!container){
     std::stringstream line;

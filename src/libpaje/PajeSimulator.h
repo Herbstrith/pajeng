@@ -66,6 +66,7 @@ public:
   PajeSimulator (bool setRastroEvent);
   ~PajeSimulator();
   void report (void);
+  void reportContainer (void);
   bool keepSimulating (void);
   
   void inputEntity (PajeObject *data);

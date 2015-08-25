@@ -32,7 +32,7 @@ public:
   virtual void addPajeTraceEvent (PajeTraceEvent *event) = 0; //for Paje[Start|End]Link
   virtual PajeContainer *container (void) const = 0;
   virtual PajeType *type (void) const = 0;
-  virtual std::string name (void) const = 0;
+  virtual const std::string &name (void) const = 0;
   virtual bool isContainedBy (PajeContainer *container) const = 0;
   virtual bool isContainer (void) const = 0;
   virtual PajeValue *value (void) const = 0;
@@ -75,7 +75,7 @@ public:
   void addPajeTraceEvent (PajeRastroTraceEvent *event);
   PajeContainer *container (void) const;
   PajeType *type (void) const;
-  std::string name (void) const;
+  const std::string &name (void) const;
   bool isContainedBy (PajeContainer *container) const;
   bool isContainer (void) const;
   PajeValue *value (void) const;
@@ -163,7 +163,7 @@ public:
   PajeNamedEntity (PajeContainer *container, PajeType *type, double time, std::string name, PajeTraceEvent *event);
   PajeNamedEntity (PajeContainer *container, PajeType *type, double time, std::string name, PajeRastroTraceEvent *event);
 
-  std::string name (void) const;
+  const std::string &name (void) const;
 };
 
 /*

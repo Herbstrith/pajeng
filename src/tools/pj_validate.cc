@@ -42,7 +42,7 @@ struct arguments {
   int quiet;
   int time;
   int flex;
-  int rastroReader;
+  int container;
 };
 
 static error_t parse_options (int key, char *arg, struct argp_state *state)
@@ -53,8 +53,7 @@ static error_t parse_options (int key, char *arg, struct argp_state *state)
   case 't': arguments->time = 1; break;
   case 'q': arguments->quiet = 1; break;
   case 'f': arguments->flex = 1; break;
-  case 'r': arguments->rastroReader = 1;break;
-  case 'x': arguments->rastroReader = 2;break;
+  case 'c': arguments->container = 1; break;
   case 'v': printf("%s\n", LIBPAJE_VERSION_STRING); exit(0); break;
   case ARGP_KEY_ARG:
     if (arguments->input_size == VALIDATE_INPUT_SIZE) {
@@ -101,6 +100,12 @@ int main (int argc, char **argv)
 
   if (arguments.time){
     printf ("%f\n", unity->getTime());
+  }
+
+  if (arguments.container){
+    unity->reportContainer();
+    delete unity;
+    return 0;
   }
 
   if (!arguments.quiet){
